@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: translations@galette.eu\n"
 "POT-Creation-Date: 2026-09-02 16:34+0200\n"
-"PO-Revision-Date: 2026-07-16 06:22+0000\n"
+"PO-Revision-Date: 2026-09-15 07:51+0000\n"
 "Last-Translator: Jože Felicijan <joze@felicijan.com>\n"
 "Language-Team: Slovenian <https://hosted.weblate.org/projects/galette/maps-"
 "plugin/sl/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 2026.8.dev0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: ../_routes.php:22
 msgid "Javascript libraries has not been built!"
@@ -44,15 +44,15 @@ msgstr "% geografski položaj člana"
 #: ../lib/GaletteMaps/Controllers/MapsController.php:170
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:60
 msgid "Maps settings"
-msgstr ""
+msgstr "Nastavitve zemljevidov"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:216
 msgid "An address is required to use your own background map."
-msgstr ""
+msgstr "Za uporabo lastnega zemljevida ozadja je potreben naslov."
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:232
 msgid "Maps settings have been saved."
-msgstr ""
+msgstr "Nastavitve zemljevidov so shranjene."
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:262
 msgid "Superadmin cannot be localized."
@@ -81,7 +81,7 @@ msgstr "Nekaj je šlo narobe :("
 
 #: ../lib/GaletteMaps/TileProviders.php:123
 msgid "OpenFreeMap, light grey"
-msgstr ""
+msgstr "OpenFreeMap, svetlo siva"
 
 #: ../lib/GaletteMaps/TileProviders.php:124
 #, fuzzy
@@ -103,7 +103,7 @@ msgstr "Sodelavci OpenStreetMapa"
 
 #: ../lib/GaletteMaps/TileProviders.php:127
 msgid "Humanitarian OSM Team"
-msgstr ""
+msgstr "Humanitarna ekipa OSM"
 
 #: ../lib/GaletteMaps/TileProviders.php:128
 #, fuzzy
@@ -113,12 +113,12 @@ msgstr "Sodelavci OpenStreetMapa"
 
 #: ../lib/GaletteMaps/TileProviders.php:129
 msgid "Esri, light grey"
-msgstr ""
+msgstr "Esri, svetlo siva"
 
 #: ../lib/GaletteMaps/TileProviders.php:130
 #: ../tempcache/maps_preferences.html.twig:80
 msgid "Your own values"
-msgstr ""
+msgstr "Vaše lastne vrednote"
 
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:73
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:119
@@ -175,46 +175,49 @@ msgstr "Zdi se, da se nahajaš zunaj meja zemljevida"
 
 #: ../tempcache/maps_preferences.html.twig:68
 msgid "Background map provider"
-msgstr ""
+msgstr "Ponudnik zemljevidov v ozadju"
 
 #: ../tempcache/maps_preferences.html.twig:86
 msgid "Vector tiles"
-msgstr ""
+msgstr "Vektorske ploščice"
 
 #: ../tempcache/maps_preferences.html.twig:86
 msgid "Tick for a MapLibre style, leave unticked for classic raster tiles."
 msgstr ""
+"Označite za slog MapLibre, pustite neoznačeno za klasične rastrske ploščice."
 
 #: ../tempcache/maps_preferences.html.twig:93
 msgid "Address"
-msgstr ""
+msgstr "Naslov"
 
 #: ../tempcache/maps_preferences.html.twig:93
 msgid "Style address for vector tiles, tiles address for raster ones, such as:"
-msgstr ""
+msgstr "Naslov sloga za vektorske ploščice, naslov ploščic za rastrske, kot so:"
 
 #: ../tempcache/maps_preferences.html.twig:99
 msgid "Attribution"
-msgstr ""
+msgstr "Pripisovanje"
 
 #: ../tempcache/maps_preferences.html.twig:99
 msgid ""
 "Credit the provider requires, HTML allowed. Data licences make it mandatory."
-msgstr ""
+msgstr "Kredit ponudnik zahteva, HTML dovoljen. Podatkovne licence so obvezne."
 
 #: ../tempcache/maps_preferences.html.twig:105
 msgid "Maximum zoom"
-msgstr ""
+msgstr "Največja povečava"
 
 #: ../tempcache/maps_preferences.html.twig:111
 msgid "Subdomains"
-msgstr ""
+msgstr "Poddomene"
 
 #: ../tempcache/maps_preferences.html.twig:111
 msgid ""
 "Letters the {s} token in the address is replaced with, such as abc. Raster "
 "tiles only."
 msgstr ""
+"Črke, s katerimi je zamenjan žeton {s} v naslovu, na primer abc. Samo "
+"rastrske ploščice."
 
 #: ../tempcache/mymap.html.twig:73
 msgid "Choose your location"
