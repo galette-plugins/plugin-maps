@@ -1,19 +1,19 @@
 ---
-title: Galette Maps
+title: Galette Zemljevidi
 description: Member geolocation and public map
 ---
 
-A [Galette](https://galette.eu) plugin to geolocalize members: it stores
-geographical coordinates for each member, and displays the ones who agreed to be
-publicly visible on a map.
+Vtičnik [Galette](https://galette.eu) za geolokalizacijo članov: shrani
+geografske koordinate za vsakega člana in na zemljevidu prikaže tiste, ki so se
+strinjali, da so javno vidni.
 
-Maps are rendered with [MapLibre GL](https://maplibre.org/) from
-[OpenFreeMap](https://openfreemap.org/) vector tiles by default — no API key, no
-registration, and the whole thing can be self-hosted. An administrator picks
-another provider, or enters their own address, from Configuration. Search is
-provided by the [Nominatim](https://nominatim.openstreetmap.org/) API.
+Zemljevidi so privzeto upodobljeni z [MapLibre GL](https://maplibre.org/) iz
+vektorskih ploščic [OpenFreeMap](https://openfreemap.org/) – brez ključa API-ja,
+brez registracije in celotno stvar lahko gostite sami. Administrator izbere
+drugega ponudnika ali vnese svoj naslov iz konfiguracije. Iskanje omogoča
+[Nominatim](https://nominatim.openstreetmap.org/) API.
 
-* [documentation](documentation.html)
+* [dokumentacija](documentation.html)
 * [bugs and features](https://bugs.galette.eu/projects/galette-plugin-maps)
 * [source code](https://github.com/galette-plugins/plugin-maps)
 * mailing lists:
