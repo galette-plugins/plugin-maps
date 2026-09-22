@@ -1,6 +1,6 @@
 ---
 title: Dokumentacija
-description: Member geolocation and public map
+description: Geolokacija članov in javni zemljevid
 ---
 
 Ta vtičnik ponuja:
@@ -14,10 +14,10 @@ Ta vtičnik ponuja:
 
 Najprej prenesite vtičnik:
 
-* [Get latest Maps
-  plugin!](https://github.com/galette-plugins/plugin-maps/releases/latest)
-* [Get Maps plugin nightly
-  build!](https://github.com/galette-plugins/plugin-maps/releases/tag/nightly)
+* [Pridobite najnovejši vtičnik
+  Zemljevidi!](https://github.com/galette-plugins/plugin-maps/releases/latest)
+* [Pridobite nočno gradnjo vtičnika
+  Zemljevidi!](https://github.com/galette-plugins/plugin-maps/releases/tag/nightly)
 
 Razširite prenesen arhiv v imenik Galette `plugins`. Na primer v Linuxu
 (zamenjajte `{url}` in `{version}` s pravilnimi vrednostmi):
@@ -36,70 +36,70 @@ Galette](https://doc.galette.eu/en/master/plugins/index.html#plugins-managment).
 
 In to je končano; vtičnik Zemljevidi je nameščen :)
 
-## Background map
+## Zemljevid ozadja
 
-> **Note** — The provider setting appeared in version 2.3.0.
+> **Opomba** — Nastavitev ponudnika se je pojavila v različici 2.3.0.
 
-The provider is a setting from `Maps settings`, in the `Configuration` menu.
+Ponudnik je nastavitev iz `Nastavitve zemljevidov` v meniju `Konfiguracija`.
 
-![The provider setting, in Maps settings](images/tiles_settings.png)
+![Nastavitev ponudnika v nastavitvah Zemljevidov](images/tiles_settings.png)
 
-Several providers are proposed:
+Predlaganih je več ponudnikov:
 
-* **OpenFreeMap, light grey** — the default. Vector tiles, in a discreet grey
-  that lets member markers stand out. No account, no API key, and the service
-  can be [self-hosted](https://openfreemap.org).
-* **OpenFreeMap, colours** — the same service, rendered in full colour.
-* **OpenStreetMap** — the standard rendering, from the OpenStreetMap Foundation
-  servers.
-* **OpenStreetMap France** and **Humanitarian OSM Team** — hosted by the OSM-FR
-  association; the second one gives more weight to roads and facilities.
-* **OpenStreetMap Germany** — German rendering, favouring local names.
-* **Esri, light grey** — a very light grey rendering, close to what the plugin
-  displayed before.
+* **OpenFreeMap, svetlo siva** — privzeto. Vektorske ploščice v diskretni sivi
+  barvi, ki omogoča, da oznake članov izstopajo. Brez računa, brez ključa API in
+  storitev lahko [samostuje](https://openfreemap.org).
+* **OpenFreeMap, barve** — ista storitev, prikazana v vseh barvah.
+* **OpenStreetMap** — standardno upodabljanje iz strežnikov OpenStreetMap
+  Foundation.
+* **OpenStreetMap France** in **Humanitarian OSM Team** — gosti združenje
+  OSM-FR; drugi daje večjo težo cestam in objektom.
+* **OpenStreetMap Germany** — nemško upodabljanje, prednost lokalnim imenom.
+* **Esri, svetlo siva** — upodabljanje v zelo svetlo sivi barvi, podobno temu,
+  kar je vtičnik prikazal prej.
 
-### Your own values
+### Vaše lastne vrednote
 
-> **Warning** — Check the usage policy of the provider you choose. Most of them
-> are run by associations or by volunteers, and they set conditions on the
-> traffic they accept.
+> **Opozorilo** — Preverite politiko uporabe izbranega ponudnika. Večino jih
+> vodijo društva ali prostovoljci in postavljajo pogoje glede prometa, ki ga
+> sprejemajo.
 
-The last entry of the list, `Your own values`, replaces the proposed providers
-with an address of your own — a provider that is not listed, or your own tile
-server.
+Zadnji vnos na seznamu, `Vaše lastne vrednosti`, nadomesti predlagane ponudnike
+z vašim lastnim naslovom – ponudnikom, ki ni na seznamu, ali vašim lastnim
+strežnikom ploščic.
 
-![The fields of the Your own values entry](images/tiles_custom.png)
+![Polja vnosa Vaše lastne vrednosti](images/tiles_custom.png)
 
-* **Vector tiles** tells the plugin what it is being given: a MapLibre style
-  when ticked, classic raster tiles when not.
-* **Address** is the style address for vector tiles, and the tiles address for
-  raster ones, such as `https://tile.openstreetmap.org/{z}/{x}/{y}.png`.
-* **Attribution** is the credit the provider requires. HTML is allowed. It is
-  not a formality: data licences make it mandatory.
-* **Maximum zoom** is the deepest zoom level the provider serves. Going past it
-  displays empty tiles.
-* **Subdomains** lists the letters the `{s}` token of the address is replaced
-  with, for instance `abc`. Raster tiles only.
+* **Vektorske ploščice** povedo vtičniku, kaj je dobil: slog MapLibre, če je
+  označen, klasične rastrske ploščice, če ni.
+* **Naslov** je slogovni naslov za vektorske ploščice in naslov ploščic za
+  rastrske, kot je `https://tile.openstreetmap.org/{z}/{x}/{y}.png`.
+* **Priznanje avtorstva** je kredit, ki ga zahteva ponudnik. HTML je dovoljen.
+  To ni formalnost: podatkovne licence so obvezne.
+* **Največja povečava** je največja stopnja povečave, ki jo ponuja ponudnik. Če
+  greste mimo, se prikažejo prazne ploščice.
+* **Poddomene** navaja črke, s katerimi je zamenjan žeton `{s}` naslova, na
+  primer `abc`. Samo rastrske ploščice.
 
-## Plugin usage
+## Uporaba vtičnika
 
-Ko je vtičnik nameščen, se v meni Galette ob prijavi člana doda skupina
-»Zemljevidi«, ki vsebuje vnos »Moja lokacija«. Ta stran članu omogoča
-shranjevanje lokacije.
+Ko je vtičnik nameščen, se v meni Galette, ko je član prijavljen, doda skupina
+`Zemljevidi`, ki vsebuje vnos `Moja lokacija`. Ta stran omogoča članu
+shranjevanje svoje lokacije.
 
-Pri prikazu člana je dodan tudi gumb »Geolokaliziraj«, ki skrbnikom omogoča
+Pri prikazu člana je dodan tudi gumb `Geolocalize`, ki administratorjem omogoča
 nastavitev koordinat člana.
 
-Na seznamu javnih strani je dodan tudi vnos »Zemljevid«, ki prikazuje
-geolokalizirane člane, ki so posodobljeni. Administratorji in člani osebja bodo
+Na seznamu javnih strani je dodan tudi vnos `Zemljevid`, ki prikazuje
+geolokalizirane člane, ki so posodobljeni. Administratorji in uslužbenci bodo
 videli vse člane, medtem ko bodo preprosti člani in obiskovalci videli le
 posodobljene javne.
 
 Najprej bodo člani vnesli svoje koordinate lokacije. Na voljo je več možnosti:
 
-* if town has been set in member information, a list of possible places will be
-  proposed (via [Nominatim online
-  service](https://nominatim.openstreetmap.org)),
+* če je bilo mesto nastavljeno v informacijah o članih, bo predlagan seznam
+  možnih krajev (prek [spletne storitve
+  Nominatim](https://nominatim.openstreetmap.org)),
 * dodatno iskalno območje (zagotovljeno iz
   [OpenStreetMap](https://nominatim.openstreetmap.org/)),
 * in tudi gumb za geolokacijo z uporabo zmogljivosti brskalnika.
@@ -107,17 +107,17 @@ Najprej bodo člani vnesli svoje koordinate lokacije. Na voljo je več možnosti
 Iskalno območje se lahko uporablja pri shranjevanju lokacije članov in pri
 prikazu zemljevidov.
 
-![The list of towns proposed for a member](images/towns_list.png)
+![Seznam mest, predlaganih za člana](images/towns_list.png)
 
 Član lahko na zemljevidu določi svojo lokacijo (z želeno natančnostjo) z izbiro
 enega od predlogov:
 
-![Selecting a location on the map](images/location_select.png)
+![Izbira lokacije na zemljevidu](images/location_select.png)
 
 Z uporabo gumba za geolokalizacijo bo brskalnik določil njegov položaj:
 
-![The geolocalize button](images/geoloc.png)
+![Gumb za geolokalizacijo](images/geoloc.png)
 
 Nato se lokacija člana prikaže na zemljevidu in jo je mogoče odstraniti:
 
-![The selected location, displayed on the map](images/location_selected.png)
+![Izbrana lokacija, prikazana na zemljevidu](images/location_selected.png)
