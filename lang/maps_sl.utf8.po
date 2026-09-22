@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: translations@galette.eu\n"
 "POT-Creation-Date: 2026-09-02 16:34+0200\n"
-"PO-Revision-Date: 2026-09-15 07:51+0000\n"
+"PO-Revision-Date: 2026-09-22 17:08+0000\n"
 "Last-Translator: Jože Felicijan <joze@felicijan.com>\n"
 "Language-Team: Slovenian <https://hosted.weblate.org/projects/galette/maps-"
 "plugin/sl/>\n"
@@ -84,32 +84,24 @@ msgid "OpenFreeMap, light grey"
 msgstr "OpenFreeMap, svetlo siva"
 
 #: ../lib/GaletteMaps/TileProviders.php:124
-#, fuzzy
-#| msgid "OpenStreetMap contributors"
 msgid "OpenFreeMap, colours"
-msgstr "Sodelavci OpenStreetMapa"
+msgstr "OpenFreeMap, barve"
 
 #: ../lib/GaletteMaps/TileProviders.php:125
-#, fuzzy
-#| msgid "OpenStreetMap contributors"
 msgid "OpenStreetMap"
-msgstr "Sodelavci OpenStreetMapa"
+msgstr "OpenStreetMap"
 
 #: ../lib/GaletteMaps/TileProviders.php:126
-#, fuzzy
-#| msgid "OpenStreetMap contributors"
 msgid "OpenStreetMap France"
-msgstr "Sodelavci OpenStreetMapa"
+msgstr "OpenStreetMap Francija"
 
 #: ../lib/GaletteMaps/TileProviders.php:127
 msgid "Humanitarian OSM Team"
 msgstr "Humanitarna ekipa OSM"
 
 #: ../lib/GaletteMaps/TileProviders.php:128
-#, fuzzy
-#| msgid "OpenStreetMap contributors"
 msgid "OpenStreetMap Germany"
-msgstr "Sodelavci OpenStreetMapa"
+msgstr "OpenStreetMap Nemčija"
 
 #: ../lib/GaletteMaps/TileProviders.php:129
 msgid "Esri, light grey"
