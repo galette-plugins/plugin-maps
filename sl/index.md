@@ -1,6 +1,6 @@
 ---
 title: Galette Zemljevidi
-description: Member geolocation and public map
+description: Geolokacija članov in javni zemljevid
 ---
 
 Vtičnik [Galette](https://galette.eu) za geolokalizacijo članov: shrani
@@ -14,18 +14,18 @@ drugega ponudnika ali vnese svoj naslov iz konfiguracije. Iskanje omogoča
 [Nominatim](https://nominatim.openstreetmap.org/) API.
 
 * [dokumentacija](documentation.html)
-* [bugs and features](https://bugs.galette.eu/projects/galette-plugin-maps)
-* [source code](https://github.com/galette-plugins/plugin-maps)
-* mailing lists:
-  [users](https://lists.mailman3.com/postorius/lists/galette-users.mailman3.com/),
-  [developers](https://lists.mailman3.com/postorius/lists/galette-devel.mailman3.com/)
+* [napake in funkcije](https://bugs.galette.eu/projects/galette-plugin-maps)
+* [izvorna koda](https://github.com/galette-plugins/plugin-maps)
+* poštni seznami:
+  [uporabniki](https://lists.mailman3.com/postorius/lists/galette-users.mailman3.com/),
+  [razvijalci](https://lists.mailman3.com/postorius/lists/galette-devel.mailman3.com/)
 
-To use it you need a recent enough Galette — the required version is shown at
-the top of this page — and the plugin itself, either by:
+Če ga želite uporabljati, potrebujete dovolj najnovejšo Galette - zahtevana
+različica je prikazana na vrhu te strani - in sam vtičnik, bodisi z:
 
-* downloading it with the buttons at the top of this page,
-* or using the [source code from the
-  repository](https://github.com/galette-plugins/plugin-maps), which requires
-  some technical skills.
+* prenos z gumbi na vrhu te strani,
+* ali z uporabo [izvorne kode iz
+  repozitorija](https://github.com/galette-plugins/plugin-maps), kar zahteva
+  nekaj tehničnega znanja.
 
-See the [documentation](documentation.html) for the installation steps.
+Glejte [dokumentacijo](documentation.html) za korake namestitve.
