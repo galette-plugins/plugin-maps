@@ -90,9 +90,9 @@ class Coordinates extends GaletteTestCase
     /**
      * Set member visibility fields
      *
-     * @param int  $id_adh  Member ID
-     * @param bool $active  Is member active
-     * @param bool $public  Does member display its information
+     * @param int  $id_adh   Member ID
+     * @param bool $active   Is member active
+     * @param bool $public   Does member display its information
      * @param bool $uptodate Is member up to date
      */
     private function setVisibility(int $id_adh, bool $active, bool $public, bool $uptodate): void
