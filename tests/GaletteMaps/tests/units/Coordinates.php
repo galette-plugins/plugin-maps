@@ -75,4 +75,15 @@ class Coordinates extends GaletteTestCase
         $this->assertTrue($coords->removeCoords($member->id));
         $this->assertSame([], $coords->getCoords($member->id));
     }
+
+    /**
+     * Storing the same position again is not a failure
+     */
+    public function testSetSamePosition(): void
+    {
+        $member = $this->getMemberOne();
+        $coords = new \GaletteMaps\Coordinates();
+        $this->assertTrue($coords->setCoords($member->id, 50.362038, 3.472998));
+        $this->assertTrue($coords->setCoords($member->id, 50.362038, 3.472998));
+    }
 }

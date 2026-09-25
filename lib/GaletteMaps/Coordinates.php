@@ -213,7 +213,9 @@ class Coordinates
                 )->where(
                     [self::PK => $id]
                 );
-                $results = $zdb->execute($update);
+                //no row is affected when the position does not change
+                $zdb->execute($update);
+                return true;
             }
             return ($results->count() > 0);
         } catch (\Exception $e) {

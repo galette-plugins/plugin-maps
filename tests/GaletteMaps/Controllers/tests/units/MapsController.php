@@ -126,9 +126,8 @@ class MapsController extends GaletteRoutingTestCase
         $member_one = $this->getMemberOne();
         $this->logMember($this->dataAdherentOne());
 
-        //storing the same position again reports a failure, hence a different latitude
-        foreach ([[null, '50.362038'], [$member_one->id, '51.5']] as [$id_adh, $latitude]) {
-            $test_response = $this->postCoords($id_adh, ['latitude' => $latitude, 'longitude' => '3.472998']);
+        foreach ([null, $member_one->id] as $id_adh) {
+            $test_response = $this->postCoords($id_adh);
             $this->assertSame(200, $test_response->getStatusCode());
             $this->assertSame(
                 ['res' => true, 'message' => 'New coordinates has been stored!'],
