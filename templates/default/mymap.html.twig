@@ -134,8 +134,8 @@
                                         }).modal('show');
                                     }, "500")
                                 },
-                                error: function() {
-                                    window.alert("{{ _T("An error occurred removing coordinates :(", "maps")|e('js') }}");
+                                error: function(xhr) {
+                                    window.alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "{{ _T("An error occurred removing coordinates :(", "maps")|e('js') }}");
                                 }
                             });
                         }

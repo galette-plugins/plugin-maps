@@ -51,7 +51,8 @@
     function _iLiveHere(_id){
         $('#' + _id).click(function(e, f,g){
             var _a = $(this);
-            var _latlng = _a.data('latlng');
+            //a click on a copy of the world gives a longitude beyond 180
+            var _latlng = _a.data('latlng').wrap();
             $.ajax({
                 url: '{% if mymap is defined %}{{ url_for("maps_ilivehere") }}{% else %}{{ url_for("maps_ilivehere", {"id": member.id}) }}{% endif %}',
                 type: 'POST',
@@ -80,8 +81,8 @@
                         },
                     }).modal('show');
                 },
-                error: function(){
-                    alert("{{ _T("An error occurred during 'I live here' process :(", "maps")|e("js") }}")
+                error: function(xhr){
+                    alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "{{ _T("An error occurred during 'I live here' process :(", "maps")|e("js") }}");
                 }
             });
             return false;

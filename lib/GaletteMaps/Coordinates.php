@@ -205,8 +205,9 @@ class Coordinates
         try {
             $delete = $zdb->delete($this->getTableName());
             $delete->where([self::PK => $id]);
-            $del = $zdb->execute($delete);
-            return ($del->count() > 0);
+            //removing nothing is not an error
+            $zdb->execute($delete);
+            return true;
         } catch (\Exception $e) {
             Analog::log(
                 'Unable to remove coordinates for member '

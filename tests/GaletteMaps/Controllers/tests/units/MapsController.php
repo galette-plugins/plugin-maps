@@ -156,6 +156,51 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Coordinates out of bounds, not numeric or missing are refused
+     */
+    public function testInvalidCoords(): void
+    {
+        $member_one = $this->getMemberOne();
+        $this->logMember($this->dataAdherentOne());
+
+        $invalid = [
+            ['latitude' => '91', 'longitude' => '3'],
+            ['latitude' => '50', 'longitude' => '-180.5'],
+            ['latitude' => 'north', 'longitude' => '3'],
+            ['latitude' => '50'],
+            [],
+        ];
+        foreach ($invalid as $data) {
+            $test_response = $this->postCoords(null, $data);
+            $this->assertSame(400, $test_response->getStatusCode(), print_r($data, true));
+            $this->assertSame(
+                ['res' => false, 'message' => 'Invalid coordinates.'],
+                json_decode((string)$test_response->getBody(), true)
+            );
+        }
+        $this->assertSame([], (new Coordinates())->getCoords($member_one->id));
+
+        //bounds are included
+        $test_response = $this->postCoords(null, ['latitude' => '-90', 'longitude' => '180']);
+        $this->assertSame(200, $test_response->getStatusCode());
+    }
+
+    /**
+     * Removing coordinates of a member that has none is not an error
+     */
+    public function testRemoveMissingCoords(): void
+    {
+        $this->getMemberOne();
+        $this->logMember($this->dataAdherentOne());
+        $test_response = $this->postCoords(null, ['remove' => '1']);
+        $this->assertSame(200, $test_response->getStatusCode());
+        $this->assertSame(
+            ['res' => true, 'message' => 'Coordinates has been removed!'],
+            json_decode((string)$test_response->getBody(), true)
+        );
+    }
+
+    /**
      * A member cannot display coordinates of another member
      */
     public function testMemberCannotShowOtherMemberCoords(): void
@@ -248,6 +293,7 @@ class MapsController extends GaletteRoutingTestCase
         $this->assertCount(3, (array)(new Coordinates())->getCoords($member_one->id));
 
         $test_response = $this->postCoords(null);
+        $this->assertSame(400, $test_response->getStatusCode());
         $this->assertSame(
             ['res' => false, 'message' => 'Superadmin cannot be localized.'],
             json_decode((string)$test_response->getBody(), true)

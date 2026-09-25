@@ -261,6 +261,7 @@ class MapsController extends AbstractPluginController
                 Analog::INFO
             );
             $error = _T('Superadmin cannot be localized.', 'maps');
+            $status = 400;
         } else {
             $id ??= (int)$this->login->id;
             $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
@@ -280,29 +281,29 @@ class MapsController extends AbstractPluginController
             $post = $request->getParsedBody();
             $coords = new Coordinates();
             if (isset($post['remove'])) {
-                $res = $coords->removeCoords($id);
-                if ($res > 0) {
+                if ($coords->removeCoords($id)) {
                     $message = _T('Coordinates has been removed!', 'maps');
                 } else {
                     $error = _T('Coordinates has not been removed :(', 'maps');
+                    $status = 500;
                 }
-            } elseif (
-                isset($post['latitude'])
-                && isset($post['longitude'])
-            ) {
-                $res = $coords->setCoords(
-                    $id,
-                    (float)$post['latitude'],
-                    (float)$post['longitude']
-                );
-
-                if ($res === true) {
+            } else {
+                $latitude = filter_var($post['latitude'] ?? null, FILTER_VALIDATE_FLOAT);
+                $longitude = filter_var($post['longitude'] ?? null, FILTER_VALIDATE_FLOAT);
+                if (
+                    $latitude === false
+                    || $longitude === false
+                    || abs($latitude) > 90
+                    || abs($longitude) > 180
+                ) {
+                    $error = _T('Invalid coordinates.', 'maps');
+                    $status = 400;
+                } elseif ($coords->setCoords($id, $latitude, $longitude)) {
                     $message = _T('New coordinates has been stored!', 'maps');
                 } else {
                     $error = _T('Coordinates has not been stored :(', 'maps');
+                    $status = 500;
                 }
-            } else {
-                $error = _T('Something went wrong :(', 'maps');
             }
         }
 
