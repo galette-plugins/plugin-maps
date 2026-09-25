@@ -363,18 +363,13 @@ class MapsController extends AbstractPluginController
             }
         }
 
-        $response = $response
-            ->withStatus($status)
-            ->withHeader('Content-type', 'application/json');
-
-        $res = [
-            'res'       => $error === null,
-            'message'   => ($error ?? $message)
-        ];
-
-        $body = $response->getBody();
-        $body->write(json_encode($res));
-
-        return $response;
+        return $this->withJson(
+            $response,
+            [
+                'res'       => $error === null,
+                'message'   => ($error ?? $message)
+            ],
+            $status
+        );
     }
 }
