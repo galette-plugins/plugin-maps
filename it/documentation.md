@@ -81,6 +81,30 @@ server.
 * **Subdomains** lists the letters the `{s}` token of the address is replaced
   with, for instance `abc`. Raster tiles only.
 
+## Positions precision
+
+A member's stored position is often their home address. The map does not show it
+as is: positions are snapped to a grid, so a marker lands near the member, not
+on their door.
+
+The precision is a setting from `Maps settings`, in the `Configuration` menu:
+
+* **About 100 km**, **About 50 km**, **About 5 km** — for a region, a
+  département or a town;
+* **About 500 m** — the default, a neighbourhood;
+* **About 50 m** — a street;
+* **Exact position** — no snapping, as the plugin behaved before.
+
+The value is how far, at most, a marker may be from the stored position.
+
+Snapping applies to visitors and to members, group managers included. Staff
+members and administrators see exact positions, and every member sees their own
+position as they stored it. The page used to set a member's position is not
+concerned: it shows the exact position to the people allowed to open it.
+
+When the map shows snapped positions, zooming stops at a level matching the
+precision, so that a marker does not seem to point at a precise address.
+
 ## Plugin usage
 
 A plugin installato, si aggiunge il gruppo `Maps` al menu di Galette
