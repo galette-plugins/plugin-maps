@@ -248,6 +248,7 @@ class MapsController extends GaletteRoutingTestCase
         $this->assertSame(200, $test_response->getStatusCode());
         $body = (string)$test_response->getBody();
         $this->assertStringContainsString('id="possible_towns"', $body);
+        $this->assertStringContainsString('In the database, town is set to: &#039;Valenciennes&#039;', $body);
         $this->assertStringContainsString('data-lat="50.3620" data-lng="3.4729"', $body);
         $this->assertStringContainsString('&lt;b&gt;Petit&lt;/b&gt; Valenciennes', $body);
         $this->assertStringNotContainsString('<b>Petit</b>', $body);
@@ -415,8 +416,11 @@ class MapsController extends GaletteRoutingTestCase
         (new Coordinates($this->zdb, $this->login))->set($member_one->id, 48.85, 2.35);
         $test_response = $this->app->handle($request);
         $this->assertSame(200, $test_response->getStatusCode());
-        $config = $this->getMapsConfig((string)$test_response->getBody());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('Maps - ' . $member_one->sfullname . ' geographic position', $body);
+        $config = $this->getMapsConfig($body);
         $this->assertSame(['lat' => '48.850000', 'lng' => '2.350000', 'zoom' => 12], $config['center']);
+        $this->assertSame('You clicked at %1$s', $config['strings']['clicked_at']);
         $this->assertSame(['latitude' => '48.850000', 'longitude' => '2.350000'], $config['member']['position']);
         $this->assertSame('I live here!', $config['strings']['lives_here']);
     }

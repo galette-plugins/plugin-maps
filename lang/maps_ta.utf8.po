@@ -36,9 +36,11 @@ msgid ""
 "database?"
 msgstr "ஒருங்கிணைப்புகள் ஏற்றப்படவில்லை. தரவுத்தளத்தில் சொருகி அட்டவணைகள் இல்லை?"
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/Controllers/MapsController.php:133
-msgid "%member geographic position"
-msgstr "%உறுப்பினர் புவியியல் நிலை"
+#, php-format
+msgid "%1$s geographic position"
+msgstr "%1$s புவியியல் நிலை"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:170
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:60
@@ -128,9 +130,11 @@ msgstr "எனது உள்ளூராக்கல்"
 msgid "Geolocalize"
 msgstr "சியோலோகலைச்"
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:154
-msgid "Geolocalize %membername"
-msgstr "Jeolocalize %membername"
+#, php-format
+msgid "Geolocalize %1$s"
+msgstr "Jeolocalize %1$s"
 
 #: ../tempcache/maps.html.twig:115
 msgid "aka"
@@ -220,20 +224,23 @@ msgid "Choose your location"
 msgstr "உங்கள் இருப்பிடத்தைத் தேர்வுசெய்க"
 
 #: ../tempcache/mymap.html.twig:79
-msgid "Choose %member location"
-msgstr "%உறுப்பினர் இருப்பிடத்தைத் தேர்வுசெய்க"
+#, php-format
+msgid "Choose %1$s location"
+msgstr "%1$s இருப்பிடத்தைத் தேர்வுசெய்க"
 
 #: ../tempcache/mymap.html.twig:89
 msgid "Select your town."
 msgstr "உங்கள் ஊரைத் தேர்ந்தெடுக்கவும்."
 
 #: ../tempcache/mymap.html.twig:93
-msgid "In the database, town is set to: '%town'"
-msgstr "தரவுத்தளத்தில், நகரம் இதற்கு அமைக்கப்பட்டுள்ளது: '%நகரம்'"
+#, php-format
+msgid "In the database, town is set to: '%1$s'"
+msgstr "தரவுத்தளத்தில், நகரம் இதற்கு அமைக்கப்பட்டுள்ளது: '%1$s'"
 
 #: ../tempcache/mymap.html.twig:188
-msgid "You clicked at %p"
-msgstr "நீங்கள் %ப"
+#, php-format
+msgid "You clicked at %1$s"
+msgstr "நீங்கள் %1$s"
 
 #: ../tempcache/mymap.html.twig:191 ../tempcache/mymap.html.twig:312
 #: ../tempcache/mymap.html.twig:341

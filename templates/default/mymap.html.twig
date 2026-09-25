@@ -15,13 +15,13 @@
         {% if mymap is defined %}
             {{ _T("Choose your location", "maps") }}
         {% else %}
-            {{ _T("Choose %member location", "maps")|replace({'%member': member.sname}) }}
+            {{ _T("Choose %1$s location", "maps")|format(member.sname) }}
         {% endif %}
         </div>
         <div class="content">
             <div class="description">
                 <p>{{ _T("Select your town.", "maps") }}<br/>
-                {{ _T("In the database, town is set to: '%town'", "maps")|replace({'%town': member.town}) }}</p>
+                {{ _T("In the database, town is set to: '%1$s'", "maps")|format(member.town) }}</p>
             </div>
         </div>
         <div class="actions">

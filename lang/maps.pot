@@ -33,8 +33,10 @@ msgid ""
 "database?"
 msgstr ""
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/Controllers/MapsController.php:133
-msgid "%member geographic position"
+#, php-format
+msgid "%1$s geographic position"
 msgstr ""
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:170
@@ -117,8 +119,10 @@ msgstr ""
 msgid "Geolocalize"
 msgstr ""
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:154
-msgid "Geolocalize %membername"
+#, php-format
+msgid "Geolocalize %1$s"
 msgstr ""
 
 #: ../templates/default/maps.html.twig:28
@@ -209,7 +213,8 @@ msgid "Choose your location"
 msgstr ""
 
 #: ../templates/default/mymap.html.twig:18
-msgid "Choose %member location"
+#, php-format
+msgid "Choose %1$s location"
 msgstr ""
 
 #: ../templates/default/mymap.html.twig:23
@@ -217,11 +222,13 @@ msgid "Select your town."
 msgstr ""
 
 #: ../templates/default/mymap.html.twig:24
-msgid "In the database, town is set to: '%town'"
+#, php-format
+msgid "In the database, town is set to: '%1$s'"
 msgstr ""
 
 #: ../templates/default/mymap.html.twig:80
-msgid "You clicked at %p"
+#, php-format
+msgid "You clicked at %1$s"
 msgstr ""
 
 #: ../templates/default/mymap.html.twig:80 ../templates/default/mymap.html.twig:153

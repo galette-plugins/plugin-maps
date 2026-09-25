@@ -109,6 +109,7 @@ class PluginGaletteMaps extends GaletteTestCase
             ['name' => 'maps_localize_member', 'args' => ['id' => $member->id]],
             $actions[0]['route']
         );
+        $this->assertSame('Geolocalize ' . $member->sname, $actions[0]['title']);
         $this->assertSame($actions, $plugin->getDetailedActions($member));
     }
 

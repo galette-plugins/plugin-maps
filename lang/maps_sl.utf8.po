@@ -37,8 +37,10 @@ msgstr ""
 "Koordinate niso bile naložene. Morda tabele vtičnikov ne obstajajo v zbirki "
 "podatkov?"
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/Controllers/MapsController.php:133
-msgid "%member geographic position"
+#, fuzzy, php-format
+msgid "%1$s geographic position"
 msgstr "% geografski položaj člana"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:170
@@ -121,9 +123,11 @@ msgstr "Moja lokalizacija"
 msgid "Geolocalize"
 msgstr "Geolokaliziraj"
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:154
-msgid "Geolocalize %membername"
-msgstr "Geolokaliziraj %membername"
+#, php-format
+msgid "Geolocalize %1$s"
+msgstr "Geolokaliziraj %1$s"
 
 #: ../tempcache/maps.html.twig:115
 msgid "aka"
@@ -216,20 +220,23 @@ msgid "Choose your location"
 msgstr "Izberite svojo lokacijo"
 
 #: ../tempcache/mymap.html.twig:79
-msgid "Choose %member location"
-msgstr "Izberite lokacijo %member"
+#, php-format
+msgid "Choose %1$s location"
+msgstr "Izberite lokacijo %1$s"
 
 #: ../tempcache/mymap.html.twig:89
 msgid "Select your town."
 msgstr "Izberite svoje mesto."
 
 #: ../tempcache/mymap.html.twig:93
-msgid "In the database, town is set to: '%town'"
-msgstr "V podatkovni bazi je mesto nastavljeno na: '%town'"
+#, php-format
+msgid "In the database, town is set to: '%1$s'"
+msgstr "V podatkovni bazi je mesto nastavljeno na: '%1$s'"
 
 #: ../tempcache/mymap.html.twig:188
-msgid "You clicked at %p"
-msgstr "Kliknili ste ob %p"
+#, php-format
+msgid "You clicked at %1$s"
+msgstr "Kliknili ste ob %1$s"
 
 #: ../tempcache/mymap.html.twig:191 ../tempcache/mymap.html.twig:312
 #: ../tempcache/mymap.html.twig:341

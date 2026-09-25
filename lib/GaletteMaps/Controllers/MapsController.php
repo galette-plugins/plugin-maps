@@ -166,10 +166,10 @@ class MapsController extends AbstractPluginController
         }
 
         $params = [
-            'page_title'        => _T('Maps', 'maps') . ' - ' . str_replace(
-                '%member',
-                $member->sfullname,
-                _T('%member geographic position', 'maps')
+            'page_title'        => _T('Maps', 'maps') . ' - ' . sprintf(
+                //TRANS: parameter is the member name
+                _T('%1$s geographic position', 'maps'),
+                $member->sfullname
             ),
             'member'            => $member,
             'can_edit'          => $can_edit,

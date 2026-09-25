@@ -105,11 +105,11 @@
             where.appendChild(el('br'));
             where.appendChild(el('em', shown));
         } else {
-            //"You clicked at %p", the position in italics
-            const parts = config.strings.clicked_at.split('%p');
+            //"You clicked at %1$s", the position in italics
+            const parts = config.strings.clicked_at.split('%1$s');
             where.appendChild(document.createTextNode(parts[0]));
             where.appendChild(el('em', shown));
-            where.appendChild(document.createTextNode(parts.slice(1).join('%p')));
+            where.appendChild(document.createTextNode(parts.slice(1).join('%1$s')));
         }
         content.appendChild(where);
 

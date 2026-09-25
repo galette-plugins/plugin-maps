@@ -145,10 +145,10 @@ class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, M
         return [
             [
                 'label' => _T("Geolocalize", "maps"),
-                'title' => str_replace(
-                    '%membername',
-                    $member->sname,
-                    _T("Geolocalize %membername", "maps")
+                'title' => sprintf(
+                    //TRANS: parameter is the member name
+                    _T('Geolocalize %1$s', 'maps'),
+                    $member->sname
                 ),
                 'route' => [
                     'name' => 'maps_localize_member',

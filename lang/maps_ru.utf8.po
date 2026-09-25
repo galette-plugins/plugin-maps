@@ -37,9 +37,11 @@ msgstr ""
 "Координаты не были загружены. Возможно, таблицы плагина не существует в базе "
 "данных?"
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/Controllers/MapsController.php:133
-msgid "%member geographic position"
-msgstr "%member географическое положение"
+#, php-format
+msgid "%1$s geographic position"
+msgstr "%1$s географическое положение"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:170
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:60
@@ -129,9 +131,11 @@ msgstr "Моя локализация"
 msgid "Geolocalize"
 msgstr "Геолокализация"
 
+#. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:154
-msgid "Geolocalize %membername"
-msgstr "Геолокализация %membername"
+#, php-format
+msgid "Geolocalize %1$s"
+msgstr "Геолокализация %1$s"
 
 #: ../tempcache/maps.html.twig:115
 msgid "aka"
@@ -223,20 +227,23 @@ msgid "Choose your location"
 msgstr "Выберите местоположение"
 
 #: ../tempcache/mymap.html.twig:79
-msgid "Choose %member location"
-msgstr "Выберите местоположение %member"
+#, php-format
+msgid "Choose %1$s location"
+msgstr "Выберите местоположение %1$s"
 
 #: ../tempcache/mymap.html.twig:89
 msgid "Select your town."
 msgstr "Выберите свой город."
 
 #: ../tempcache/mymap.html.twig:93
-msgid "In the database, town is set to: '%town'"
-msgstr "В базе данных город имеет значение: '%town'"
+#, php-format
+msgid "In the database, town is set to: '%1$s'"
+msgstr "В базе данных город имеет значение: '%1$s'"
 
 #: ../tempcache/mymap.html.twig:188
-msgid "You clicked at %p"
-msgstr "Вы нажали на %p"
+#, php-format
+msgid "You clicked at %1$s"
+msgstr "Вы нажали на %1$s"
 
 #: ../tempcache/mymap.html.twig:191 ../tempcache/mymap.html.twig:312
 #: ../tempcache/mymap.html.twig:341
