@@ -37,6 +37,9 @@ class MapsController extends AbstractPluginController
     #[Inject]
     protected Coordinates $coordinates;
 
+    #[Inject]
+    protected NominatimTowns $nominatim;
+
     /**
      * Member dependencies to load; groups are loaded on demand by access checks
      *
@@ -146,7 +149,7 @@ class MapsController extends AbstractPluginController
         //towns are only proposed to choose a location
         if ($can_edit && $mcoords === null && trim($member->town ?? '') !== '') {
             try {
-                $towns = (new NominatimTowns($this->preferences))->search(
+                $towns = $this->nominatim->search(
                     $member->town,
                     $member->country
                 );

@@ -203,6 +203,39 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Towns matching member town are proposed when member has no coordinates
+     */
+    public function testTownsProposed(): void
+    {
+        $member_one = $this->getMemberOne();
+        $update = $this->zdb->update(Adherent::TABLE);
+        $update->set(['ville_adh' => 'Valenciennes'])->where([Adherent::PK => $member_one->id]);
+        $this->zdb->execute($update);
+        $places = [
+            ['lat' => '50.3620', 'lon' => '3.4729', 'display_name' => 'Valenciennes', 'address' => ['city' => 'Valenciennes']],
+            ['lat' => '45.1', 'lon' => '1.2', 'display_name' => 'Somewhere', 'address' => ['village' => '<b>Petit</b> Valenciennes']],
+        ];
+        $client = new \GuzzleHttp\Client([
+            'handler' => \GuzzleHttp\HandlerStack::create(
+                new \GuzzleHttp\Handler\MockHandler([new \GuzzleHttp\Psr7\Response(200, [], (string)json_encode($places))])
+            )
+        ]);
+        $this->container->set(
+            \GaletteMaps\NominatimTowns::class,
+            new \GaletteMaps\NominatimTowns($this->preferences, $client)
+        );
+
+        $this->logMember($this->dataAdherentOne());
+        $test_response = $this->app->handle($this->createRequest('maps_mymap'));
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('id="possible_towns"', $body);
+        $this->assertStringContainsString('<span class="lat">50.3620</span>/<span class="lon">3.4729</span>', $body);
+        $this->assertStringContainsString('&lt;b&gt;Petit&lt;/b&gt; Valenciennes', $body);
+        $this->assertStringNotContainsString('<b>Petit</b>', $body);
+    }
+
+    /**
      * Unreachable towns search does not prevent to display the map
      */
     public function testTownsSearchUnavailable(): void
