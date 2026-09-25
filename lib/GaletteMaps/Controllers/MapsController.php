@@ -274,7 +274,7 @@ class MapsController extends AbstractPluginController
                     . ' without the right to edit them.',
                     Analog::WARNING
                 );
-                $error = _T('You do not have enough privileges.');
+                $error = _T('You do not have permission for requested URL.');
                 $status = 403;
             }
         }

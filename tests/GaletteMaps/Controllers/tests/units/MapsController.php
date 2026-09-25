@@ -86,7 +86,8 @@ class MapsController extends GaletteRoutingTestCase
     {
         $this->assertSame(403, $test_response->getStatusCode());
         $this->assertSame(
-            ['res' => false, 'message' => 'You do not have enough privileges.'],
+            //message comes in the language of the logged-in member
+            ['res' => false, 'message' => _T('You do not have permission for requested URL.')],
             json_decode((string)$test_response->getBody(), true)
         );
         $this->expectLogEntry(
