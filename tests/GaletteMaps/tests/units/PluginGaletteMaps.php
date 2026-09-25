@@ -94,6 +94,8 @@ class PluginGaletteMaps extends GaletteTestCase
         $this->login->logout();
 
         $this->assertTrue($this->login->login($this->dataAdherentOne()['login_adh'], $this->dataAdherentOne()['mdp_adh']));
+        //fetched again, or PHPStan keeps the empty result asserted above
+        $plugin = $this->getPlugin();
         $dashboards = $plugin->getMyDashboards();
         $this->assertCount(1, $dashboards);
         $this->assertSame(
