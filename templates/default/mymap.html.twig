@@ -152,7 +152,7 @@
         };
 
         L.marker([_lat, _lon], {icon: galetteIcon}).addTo(map)
-            .bindPopup('<strong>{{ member.sfullname|escape }}</strong><br/>{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}{% if can_edit %}<br/><span id="removecoords" class="ui button">{{ _T("Remove")|e("js") }}</span>{% endif %}').openPopup();
+            .bindPopup('<strong>{{ member.sfullname|e|e("js") }}</strong><br/>{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}{% if can_edit %}<br/><span id="removecoords" class="ui button">{{ _T("Remove")|e("js") }}</span>{% endif %}').openPopup();
 {% else %}
         {# Town is not known. Show possibilities #}
         var _towns = $('#possible_towns');

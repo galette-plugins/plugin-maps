@@ -25,7 +25,7 @@
     {% else %}
         {% set icon = 'galetteIcon' %}
     {% endif %}
-        _member = [{{ l.lat }}, {{ l.lng }}, {{ icon }}, '<p><strong>{{ l.name|e("js") }}</strong>{% if l.nickname != '' %} {{ _T("aka", "maps")|e("js") }} <em>{{ l.nickname|e("js") }}</em>{% endif %}{% if l.company is defined %}<br/>{{ l.company|e("js") }}{% endif %}</p>'];
+        _member = [{{ l.lat }}, {{ l.lng }}, {{ icon }}, '<p><strong>{{ l.name|e|e("js") }}</strong>{% if l.nickname != '' %} {{ _T("aka", "maps")|e("js") }} <em>{{ l.nickname|e|e("js") }}</em>{% endif %}{% if l.company is defined %}<br/>{{ l.company|e|e("js") }}{% endif %}</p>'];
         _markers.push(_member);
 {% endfor %}
         var _group = L.markerClusterGroup();

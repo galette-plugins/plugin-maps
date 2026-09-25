@@ -208,6 +208,34 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Nicknames and company names in map popups are not interpreted as HTML
+     *
+     * Member form strips tags, stored values may not have been through it.
+     * Names are safe anyway: Adherent::getNameWithCase() strips tags.
+     */
+    public function testMapEscapesNames(): void
+    {
+        $member_one = $this->getMemberOne();
+        $update = $this->zdb->update(Adherent::TABLE);
+        $update->set([
+            'pseudo_adh' => '<b>nick</b>',
+            'societe_adh' => '<img src=x onerror=alert(1)>',
+        ])->where([Adherent::PK => $member_one->id]);
+        $this->zdb->execute($update);
+        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+
+        $this->logSuperAdmin();
+        $test_response = $this->app->handle($this->createRequest('maps_map'));
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        //a JS escaped "<" would be turned back into markup by the popup
+        $this->assertStringNotContainsString('\u003Cb\u003E', $body);
+        $this->assertStringNotContainsString('\u003Cimg', $body);
+        $this->assertStringContainsString('\u0026lt\u003Bb\u0026gt\u003Bnick', $body);
+        $this->assertStringContainsString('\u0026lt\u003Bimg\u0020src', $body);
+    }
+
+    /**
      * Superadmin changes coordinates of any member, but has none
      */
     public function testSuperAdminCoords(): void
