@@ -107,16 +107,16 @@ class MapsController extends GaletteRoutingTestCase
         //member two speaks Catalan, member one gets messages in English
         $this->getMemberOne();
         $member_two = $this->getMemberTwo();
-        $coords = new Coordinates();
-        $this->assertTrue($coords->setCoords($member_two->id, 48.85, 2.35));
+        $coords = new Coordinates($this->zdb, $this->login);
+        $coords->set($member_two->id, 48.85, 2.35);
 
         $this->logMember($this->dataAdherentOne());
         $this->expectCoordsRefused($this->postCoords($member_two->id), $member_two->id);
         $this->expectCoordsRefused($this->postCoords($member_two->id, ['remove' => '1']), $member_two->id);
 
-        $this->assertEquals(
-            ['id_adh' => $member_two->id, 'latitude' => '48.850000', 'longitude' => '2.350000'],
-            (array)$coords->getCoords($member_two->id)
+        $this->assertSame(
+            ['latitude' => '48.850000', 'longitude' => '2.350000'],
+            $coords->get($member_two->id)
         );
     }
 
@@ -136,7 +136,7 @@ class MapsController extends GaletteRoutingTestCase
                 json_decode((string)$test_response->getBody(), true)
             );
         }
-        $this->assertCount(3, (array)(new Coordinates())->getCoords($member_one->id));
+        $this->assertNotNull((new Coordinates($this->zdb, $this->login))->get($member_one->id));
     }
 
     /**
@@ -149,12 +149,12 @@ class MapsController extends GaletteRoutingTestCase
         $this->logMember($this->dataAdherentTwo());
 
         $this->expectCoordsRefused($this->postCoords($member_one->id), $member_one->id);
-        $this->assertSame([], (new Coordinates())->getCoords($member_one->id));
+        $this->assertNull((new Coordinates($this->zdb, $this->login))->get($member_one->id));
 
         $this->preferences->pref_bool_groupsmanagers_edit_member = true;
         $test_response = $this->postCoords($member_one->id);
         $this->assertSame(200, $test_response->getStatusCode());
-        $this->assertCount(3, (array)(new Coordinates())->getCoords($member_one->id));
+        $this->assertNotNull((new Coordinates($this->zdb, $this->login))->get($member_one->id));
     }
 
     /**
@@ -180,7 +180,7 @@ class MapsController extends GaletteRoutingTestCase
                 json_decode((string)$test_response->getBody(), true)
             );
         }
-        $this->assertSame([], (new Coordinates())->getCoords($member_one->id));
+        $this->assertNull((new Coordinates($this->zdb, $this->login))->get($member_one->id));
 
         //bounds are included
         $test_response = $this->postCoords(null, ['latitude' => '-90', 'longitude' => '180']);
@@ -235,7 +235,7 @@ class MapsController extends GaletteRoutingTestCase
         //member two speaks Catalan, member one gets messages in English
         $this->getMemberOne();
         $member_two = $this->getMemberTwo();
-        $this->assertTrue((new Coordinates())->setCoords($member_two->id, 48.85, 2.35));
+        (new Coordinates($this->zdb, $this->login))->set($member_two->id, 48.85, 2.35);
 
         $this->logMember($this->dataAdherentOne());
         $request = $this->createRequest('maps_localize_member', ['id' => (string)$member_two->id]);
@@ -260,7 +260,7 @@ class MapsController extends GaletteRoutingTestCase
     {
         $member_one = $this->getMemberOne();
         $this->makeMemberTwoManager([$member_one]);
-        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        (new Coordinates($this->zdb, $this->login))->set($member_one->id, 48.85, 2.35);
         $this->logMember($this->dataAdherentTwo());
 
         $request = $this->createRequest('maps_localize_member', ['id' => (string)$member_one->id]);
@@ -294,7 +294,7 @@ class MapsController extends GaletteRoutingTestCase
             'societe_adh' => '<img src=x onerror=alert(1)>',
         ])->where([Adherent::PK => $member_one->id]);
         $this->zdb->execute($update);
-        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        (new Coordinates($this->zdb, $this->login))->set($member_one->id, 48.85, 2.35);
 
         $this->logSuperAdmin();
         $test_response = $this->app->handle($this->createRequest('maps_map'));
@@ -313,7 +313,7 @@ class MapsController extends GaletteRoutingTestCase
     public function testPublicMap(): void
     {
         $member_one = $this->getMemberOne();
-        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        (new Coordinates($this->zdb, $this->login))->set($member_one->id, 48.85, 2.35);
         $request = $this->createRequest('maps_map');
 
         $this->preferences->pref_bool_publicpages = false;
@@ -355,7 +355,7 @@ class MapsController extends GaletteRoutingTestCase
         $this->assertStringNotContainsString('id="removecoords"', $body);
         $this->assertStringContainsString('onMapClick', $body);
 
-        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        (new Coordinates($this->zdb, $this->login))->set($member_one->id, 48.85, 2.35);
         $test_response = $this->app->handle($request);
         $this->assertSame(200, $test_response->getStatusCode());
         $body = (string)$test_response->getBody();
@@ -495,7 +495,7 @@ class MapsController extends GaletteRoutingTestCase
 
         $test_response = $this->postCoords($member_one->id);
         $this->assertSame(200, $test_response->getStatusCode());
-        $this->assertCount(3, (array)(new Coordinates())->getCoords($member_one->id));
+        $this->assertNotNull((new Coordinates($this->zdb, $this->login))->get($member_one->id));
 
         $test_response = $this->postCoords(null);
         $this->assertSame(400, $test_response->getStatusCode());

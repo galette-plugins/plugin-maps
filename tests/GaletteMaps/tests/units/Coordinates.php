@@ -37,23 +37,22 @@ class Coordinates extends GaletteTestCase
     public function testCoordinates(): void
     {
         $member = $this->getMemberOne();
-        $coords = new \GaletteMaps\Coordinates();
-        $this->assertSame([], $coords->getCoords($member->id));
-        $this->assertSame([], $coords->listCoords());
+        $coords = new \GaletteMaps\Coordinates($this->zdb, $this->login);
+        $this->assertNull($coords->get($member->id));
+        $this->assertSame([], $coords->listVisible());
 
         $this->logSuperAdmin();
-        $this->assertSame([], $coords->getCoords($member->id));
-        $this->assertSame([], $coords->listCoords());
+        $this->assertNull($coords->get($member->id));
+        $this->assertSame([], $coords->listVisible());
 
         //set coordinates for member one
-        $this->assertTrue($coords->setCoords($member->id, 50.362038, 3.472998));
-        $this->assertEquals(
+        $coords->set($member->id, 50.362038, 3.472998);
+        $this->assertSame(
             [
-                'id_adh' => $member->id,
                 'latitude' => '50.362038',
                 'longitude' => '3.472998'
             ],
-            (array)$coords->getCoords($member->id)
+            $coords->get($member->id)
         );
         $this->assertEquals(
             [
@@ -65,15 +64,15 @@ class Coordinates extends GaletteTestCase
                     'nickname' => 'ubertrand'
                 ]
             ],
-            $coords->listCoords()
+            $coords->listVisible()
         );
 
         //update coordinates for member one
-        $this->assertTrue($coords->setCoords($member->id, 51.362038, 3.572998));
+        $coords->set($member->id, 51.362038, 3.572998);
 
         //remove coordinates for member one
-        $this->assertTrue($coords->removeCoords($member->id));
-        $this->assertSame([], $coords->getCoords($member->id));
+        $coords->remove($member->id);
+        $this->assertNull($coords->get($member->id));
     }
 
     /**
@@ -82,9 +81,9 @@ class Coordinates extends GaletteTestCase
     public function testSetSamePosition(): void
     {
         $member = $this->getMemberOne();
-        $coords = new \GaletteMaps\Coordinates();
-        $this->assertTrue($coords->setCoords($member->id, 50.362038, 3.472998));
-        $this->assertTrue($coords->setCoords($member->id, 50.362038, 3.472998));
+        $coords = new \GaletteMaps\Coordinates($this->zdb, $this->login);
+        $coords->set($member->id, 50.362038, 3.472998);
+        $coords->set($member->id, 50.362038, 3.472998);
     }
 
     /**
@@ -115,7 +114,7 @@ class Coordinates extends GaletteTestCase
      */
     private function listedIds(): array
     {
-        $ids = array_column((new \GaletteMaps\Coordinates())->listCoords(), 'id_adh');
+        $ids = array_column((new \GaletteMaps\Coordinates($this->zdb, $this->login))->listVisible(), 'id_adh');
         sort($ids);
         return $ids;
     }
@@ -127,9 +126,9 @@ class Coordinates extends GaletteTestCase
     {
         $member_one = $this->getMemberOne();
         $member_two = $this->getMemberTwo();
-        $coords = new \GaletteMaps\Coordinates();
-        $this->assertTrue($coords->setCoords($member_one->id, 50.36, 3.47));
-        $this->assertTrue($coords->setCoords($member_two->id, 48.85, 2.35));
+        $coords = new \GaletteMaps\Coordinates($this->zdb, $this->login);
+        $coords->set($member_one->id, 50.36, 3.47);
+        $coords->set($member_two->id, 48.85, 2.35);
 
         $this->setVisibility($member_one->id, active: true, public: false, uptodate: false);
         $this->setVisibility($member_two->id, active: true, public: true, uptodate: true);
@@ -147,5 +146,26 @@ class Coordinates extends GaletteTestCase
         $this->setVisibility($member_two->id, active: false, public: true, uptodate: true);
         $this->assertSame([], $this->listedIds());
         $this->login->logout();
+    }
+
+    /**
+     * Storing coordinates of a member that does not exist raises
+     */
+    public function testSetMissingMember(): void
+    {
+        $coords = new \GaletteMaps\Coordinates($this->zdb, $this->login);
+        //a failing query aborts the whole transaction on PostgreSQL
+        $this->zdb->db->query('SAVEPOINT maps_set', \Laminas\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        try {
+            $coords->set(999999, 50.36, 3.47);
+            $this->fail('An exception was expected');
+        } catch (\Throwable $e) {
+            $this->assertNotInstanceOf(\PHPUnit\Framework\AssertionFailedError::class, $e);
+        } finally {
+            $this->zdb->db->query('ROLLBACK TO SAVEPOINT maps_set', \Laminas\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
+        }
+        $this->assertNull($coords->get(999999));
+        //logged by Db
+        $this->expectLogEntry(\Analog\Analog::ERROR, 'Query error: INSERT INTO');
     }
 }

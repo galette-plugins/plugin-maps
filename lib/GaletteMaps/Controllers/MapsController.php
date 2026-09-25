@@ -34,6 +34,9 @@ class MapsController extends AbstractPluginController
     #[Inject("Plugin Galette Maps")]
     protected array $module_info;
 
+    #[Inject]
+    protected Coordinates $coordinates;
+
     /**
      * Member dependencies to load; groups are loaded on demand by access checks
      *
@@ -78,9 +81,9 @@ class MapsController extends AbstractPluginController
         ];
 
         try {
-            $params['list'] = (new Coordinates())->listCoords();
+            $params['list'] = $this->coordinates->listVisible();
         } catch (\Throwable $e) {
-            //already logged
+            Analog::log('Unable to list coordinates | ' . $e->getMessage(), Analog::ERROR);
             $this->flash->addMessageNow(
                 'error_detected',
                 _T('Coordinates has not been loaded. Maybe plugin tables does not exists in the database?', 'maps')
@@ -137,12 +140,11 @@ class MapsController extends AbstractPluginController
         }
         $can_edit = $member->canEdit($this->login);
 
-        $coords = new Coordinates();
-        $mcoords = $coords->getCoords($member->id);
+        $mcoords = $this->coordinates->get($member->id);
 
         $towns = false;
         //towns are only proposed to choose a location
-        if ($can_edit && count($mcoords) === 0 && trim($member->town ?? '') !== '') {
+        if ($can_edit && $mcoords === null && trim($member->town ?? '') !== '') {
             try {
                 $towns = (new NominatimTowns($this->preferences))->search(
                     $member->town,
@@ -175,7 +177,7 @@ class MapsController extends AbstractPluginController
 
         if ($towns !== false) {
             $params['towns'] = $towns;
-        } elseif (count($mcoords) > 0) {
+        } elseif ($mcoords !== null) {
             $params['town'] = $mcoords;
         }
 
@@ -319,11 +321,15 @@ class MapsController extends AbstractPluginController
 
         if ($error === null) {
             $post = $request->getParsedBody();
-            $coords = new Coordinates();
             if (isset($post['remove'])) {
-                if ($coords->removeCoords($id)) {
+                try {
+                    $this->coordinates->remove($id);
                     $message = _T('Coordinates has been removed!', 'maps');
-                } else {
+                } catch (\Throwable $e) {
+                    Analog::log(
+                        'Unable to remove coordinates of member #' . $id . ' | ' . $e->getMessage(),
+                        Analog::ERROR
+                    );
                     $error = _T('Coordinates has not been removed :(', 'maps');
                     $status = 500;
                 }
@@ -338,11 +344,18 @@ class MapsController extends AbstractPluginController
                 ) {
                     $error = _T('Invalid coordinates.', 'maps');
                     $status = 400;
-                } elseif ($coords->setCoords($id, $latitude, $longitude)) {
-                    $message = _T('New coordinates has been stored!', 'maps');
                 } else {
-                    $error = _T('Coordinates has not been stored :(', 'maps');
-                    $status = 500;
+                    try {
+                        $this->coordinates->set($id, $latitude, $longitude);
+                        $message = _T('New coordinates has been stored!', 'maps');
+                    } catch (\Throwable $e) {
+                        Analog::log(
+                            'Unable to store coordinates of member #' . $id . ' | ' . $e->getMessage(),
+                            Analog::ERROR
+                        );
+                        $error = _T('Coordinates has not been stored :(', 'maps');
+                        $status = 500;
+                    }
                 }
             }
         }
