@@ -248,7 +248,7 @@ class MapsController extends GaletteRoutingTestCase
         $this->assertSame(200, $test_response->getStatusCode());
         $body = (string)$test_response->getBody();
         $this->assertStringContainsString('id="possible_towns"', $body);
-        $this->assertStringContainsString('<span class="lat">50.3620</span>/<span class="lon">3.4729</span>', $body);
+        $this->assertStringContainsString('data-lat="50.3620" data-lng="3.4729"', $body);
         $this->assertStringContainsString('&lt;b&gt;Petit&lt;/b&gt; Valenciennes', $body);
         $this->assertStringNotContainsString('<b>Petit</b>', $body);
     }

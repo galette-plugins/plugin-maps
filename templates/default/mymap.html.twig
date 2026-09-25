@@ -22,26 +22,20 @@
             <div class="description">
                 <p>{{ _T("Select your town.", "maps") }}<br/>
                 {{ _T("In the database, town is set to: '%town'", "maps")|replace({'%town': member.town}) }}</p>
-                <ul>
-                </ul>
             </div>
         </div>
         <div class="actions">
             <ul>
         {% for t in towns %}
                 <li>
-                    <div class="ui labeled fluid button maps-town" data-name="{{ t.full_name }}" data-lat="{{ t.latitude }}" data-lng="{{ t.longitude }}">
-                        <div class="ui green button city">
-                            {{ t.full_name }}
-                        </div>
-                        <a class="ui basic label">
-                            <span class="lat">{{ t.latitude }}</span>/<span class="lon">{{ t.longitude }}</span>
-                        </a>
-                    </div>
+                    <button type="button" class="ui labeled button maps-town" data-name="{{ t.full_name }}" data-lat="{{ t.latitude }}" data-lng="{{ t.longitude }}">
+                        <span class="ui green button city">{{ t.full_name }}</span>
+                        <span class="ui basic label">{{ t.latitude }}/{{ t.longitude }}</span>
+                    </button>
                 </li>
         {% endfor %}
             </ul>
-            <div class="ui button cancel">{{ _T("Close") }}</div>
+            <button type="button" class="ui button cancel">{{ _T("Close") }}</button>
         </div>
     </div>
 {% endif %}

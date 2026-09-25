@@ -4,31 +4,20 @@
  # SPDX-License-Identifier: GPL-3.0-or-later
  #}
 
+{# images are decorative: each one comes with its text #}
 <div id="legend">
-    <table>
-        <tr>
-            <th>
-                <img src="{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette.png"}) }}" alt="{{ _T("Member") }}"/>
-            </th>
-            <td>
-                {{ _T("Member") }}
-            </td>
-        </tr>
-        <tr>
-            <th>
-                <img src="{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette-pro.png"}) }}" alt="{{ _T("Member (company)", "maps") }}"/>
-            </th>
-            <td>
-                {{ _T("Member (company)", "maps") }}
-            </td>
-        </tr>
-        <tr>
-            <th>
-                <img src="{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-icon.png"}) }}" alt="{{ _T("Search result", "maps") }}"/>
-            </th>
-            <td>
-                {{ _T("Search result", "maps") }}
-            </td>
-        </tr>
-    </table>
+    <ul class="maps-legend">
+        <li>
+            <img src="{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette.png"}) }}" alt=""/>
+            {{ _T("Member") }}
+        </li>
+        <li>
+            <img src="{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette-pro.png"}) }}" alt=""/>
+            {{ _T("Member (company)", "maps") }}
+        </li>
+        <li>
+            <img src="{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-icon.png"}) }}" alt=""/>
+            {{ _T("Search result", "maps") }}
+        </li>
+    </ul>
 </div>

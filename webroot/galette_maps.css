@@ -10,8 +10,26 @@
     min-height: 100%;
 }
 
+#possible_towns ul,
+#map .maps-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 #possible_towns li {
     margin-bottom: .5em;
+}
+
+#map .maps-legend li {
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    margin: .2em 0;
+}
+
+#map .maps-legend img {
+    height: 25px;
 }
 
 .leaflet-control-legend a {
