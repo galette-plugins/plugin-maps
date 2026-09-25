@@ -84,7 +84,9 @@ class Coordinates
                 [
                     'a' => PREFIX_DB . Adherent::TABLE
                 ],
-                'a.' . self::PK . '=' . 'c.' . self::PK
+                'a.' . self::PK . '=' . 'c.' . self::PK,
+                //only what the map displays
+                ['nom_adh', 'prenom_adh', 'pseudo_adh', 'societe_adh']
             )->where->equalTo(
                 'activite_adh',
                 new Expression('true')
@@ -145,16 +147,15 @@ class Coordinates
 
             $res = [];
             foreach ($results as $r) {
-                $a = new Adherent($zdb, $r);
                 $m = [
-                    'id_adh'    => $a->id,
+                    'id_adh'    => (int)$r->{self::PK},
                     'lat'       => $r->latitude,
                     'lng'       => $r->longitude,
-                    'name'      => $a->sname,
-                    'nickname'  => $a->nickname
+                    'name'      => Adherent::getNameWithCase($r->nom_adh, $r->prenom_adh),
+                    'nickname'  => $r->pseudo_adh
                 ];
-                if ($a->isCompany()) {
-                    $m['company'] = $a->company_name;
+                if (trim($r->societe_adh ?? '') !== '') {
+                    $m['company'] = $r->societe_adh;
                 }
                 $res[] = $m;
             }
