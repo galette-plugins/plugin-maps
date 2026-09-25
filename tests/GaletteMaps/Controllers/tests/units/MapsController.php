@@ -22,7 +22,7 @@ use GaletteMaps\Coordinates;
  */
 class MapsController extends GaletteRoutingTestCase
 {
-    protected int $seed = 20260925143012;
+    protected int $seed = 20260925101512;
     protected bool $load_plugins = true;
 
     /**
@@ -101,18 +101,19 @@ class MapsController extends GaletteRoutingTestCase
      */
     public function testMemberCannotChangeOtherMemberCoords(): void
     {
-        $member_one = $this->getMemberOne();
-        $this->getMemberTwo();
+        //member two speaks Catalan, member one gets messages in English
+        $this->getMemberOne();
+        $member_two = $this->getMemberTwo();
         $coords = new Coordinates();
-        $this->assertTrue($coords->setCoords($member_one->id, 48.85, 2.35));
+        $this->assertTrue($coords->setCoords($member_two->id, 48.85, 2.35));
 
-        $this->logMember($this->dataAdherentTwo());
-        $this->expectCoordsRefused($this->postCoords($member_one->id), $member_one->id);
-        $this->expectCoordsRefused($this->postCoords($member_one->id, ['remove' => '1']), $member_one->id);
+        $this->logMember($this->dataAdherentOne());
+        $this->expectCoordsRefused($this->postCoords($member_two->id), $member_two->id);
+        $this->expectCoordsRefused($this->postCoords($member_two->id, ['remove' => '1']), $member_two->id);
 
         $this->assertEquals(
-            ['id_adh' => $member_one->id, 'latitude' => '48.850000', 'longitude' => '2.350000'],
-            (array)$coords->getCoords($member_one->id)
+            ['id_adh' => $member_two->id, 'latitude' => '48.850000', 'longitude' => '2.350000'],
+            (array)$coords->getCoords($member_two->id)
         );
     }
 
@@ -152,6 +153,58 @@ class MapsController extends GaletteRoutingTestCase
         $test_response = $this->postCoords($member_one->id);
         $this->assertSame(200, $test_response->getStatusCode());
         $this->assertCount(3, (array)(new Coordinates())->getCoords($member_one->id));
+    }
+
+    /**
+     * A member cannot display coordinates of another member
+     */
+    public function testMemberCannotShowOtherMemberCoords(): void
+    {
+        //member two speaks Catalan, member one gets messages in English
+        $this->getMemberOne();
+        $member_two = $this->getMemberTwo();
+        $this->assertTrue((new Coordinates())->setCoords($member_two->id, 48.85, 2.35));
+
+        $this->logMember($this->dataAdherentOne());
+        $request = $this->createRequest('maps_localize_member', ['id' => (string)$member_two->id]);
+        $test_response = $this->app->handle($request);
+        $this->assertSame(
+            ['Location' => [$this->routeparser->urlFor('me')]],
+            $test_response->getHeaders()
+        );
+        $this->assertSame(301, $test_response->getStatusCode());
+        $this->expectFlashData(['error_detected' => ['You do not have permission for requested URL.']]);
+        $this->expectLogEntry(
+            Analog::WARNING,
+            'has tried to display coordinates of member #' . $member_two->id
+        );
+        $this->expectNoLogEntry();
+    }
+
+    /**
+     * Group managers display coordinates of their members, and change them only when core allows them to
+     */
+    public function testManagerShowsCoords(): void
+    {
+        $member_one = $this->getMemberOne();
+        $this->makeMemberTwoManager([$member_one]);
+        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        $this->logMember($this->dataAdherentTwo());
+
+        $request = $this->createRequest('maps_localize_member', ['id' => (string)$member_one->id]);
+        $test_response = $this->app->handle($request);
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('48.850000', $body);
+        $this->assertStringNotContainsString('id="removecoords"', $body);
+        $this->assertStringNotContainsString('onMapClick', $body);
+
+        $this->preferences->pref_bool_groupsmanagers_edit_member = true;
+        $test_response = $this->app->handle($request);
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('id="removecoords"', $body);
+        $this->assertStringContainsString('onMapClick', $body);
     }
 
     /**

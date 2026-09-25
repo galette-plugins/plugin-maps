@@ -98,34 +98,27 @@ class MapsController extends AbstractPluginController
         }
         $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
 
-        if (
-            $this->login->id != $id
-            && !$this->login->isAdmin()
-            && !$this->login->isStaff()
-            && $this->login->isGroupManager()
-        ) {
-            //check if requested member is part of managed groups
-            $groups = $member->groups;
-            $is_managed = false;
-            foreach ($groups as $g) {
-                if ($this->login->isGroupManager($g->getId())) {
-                    $is_managed = true;
-                    break;
-                }
-            }
-            if ($is_managed !== true) {
-                //requested member is not part of managed groups, fall back to logged
-                //in member
-                //FIXME: silent fallback is maybe not the best to do
-                $member->load($this->login->id);
-            }
+        if (!$member->canShow($this->login)) {
+            Analog::log(
+                'Logged in member ' . $this->login->login
+                . ' has tried to display coordinates of member #' . $id
+                . ' without the right to show them.',
+                Analog::WARNING
+            );
+            return $this->redirectWithErrors(
+                response: $response,
+                errors: [_T("You do not have permission for requested URL.")],
+                redirect_url: $this->routeparser->urlFor('me')
+            );
         }
+        $can_edit = $member->canEdit($this->login);
 
         $coords = new Coordinates();
         $mcoords = $coords->getCoords($member->id);
 
         $towns = false;
-        if (count($mcoords) === 0) {
+        //towns are only proposed to choose a location
+        if ($can_edit && count($mcoords) === 0) {
             if ($member->town != '') {
                 $t = new NominatimTowns($this->preferences);
                 $towns = $t->search(
@@ -142,6 +135,7 @@ class MapsController extends AbstractPluginController
                 _T('%member geographic position', 'maps')
             ),
             'member'            => $member,
+            'can_edit'          => $can_edit,
             'require_dialog'    => true,
             'adh_map'           => true,
             'module_id'         => $this->getModuleId(),
