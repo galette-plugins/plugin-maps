@@ -14,6 +14,7 @@ use Analog\Analog;
 use Galette\Entity\Adherent;
 use Galette\Tests\GaletteRoutingTestCase;
 use GaletteMaps\Coordinates;
+use GaletteMaps\TileProviders;
 
 /**
  * Maps controller tests
@@ -379,6 +380,68 @@ class MapsController extends GaletteRoutingTestCase
         $body = (string)$test_response->getBody();
         $this->assertStringContainsString('id="pref_maps_tiles_provider"', $body);
         $this->assertStringContainsString('OpenFreeMap, light grey', $body);
+    }
+
+    /**
+     * Store preferences
+     */
+    public function testStorePreferences(): void
+    {
+        $this->logSuperAdmin();
+        $store = function (array $data): \Psr\Http\Message\ResponseInterface {
+            $request = $this->createRequest('maps_store_preferences', [], 'POST')->withParsedBody($data);
+            $test_response = $this->app->handle($request);
+            $this->assertSame(
+                ['Location' => [$this->routeparser->urlFor('maps_preferences')]],
+                $test_response->getHeaders()
+            );
+            $this->assertSame(302, $test_response->getStatusCode());
+            return $test_response;
+        };
+
+        try {
+            $store([TileProviders::PREF_PROVIDER => 'osm']);
+            $this->expectFlashData(['success_detected' => ['Maps settings have been saved.']]);
+            $this->preferences->load();
+            $this->assertSame('osm', TileProviders::resolve($this->preferences)['id']);
+
+            //own values need an address
+            $store([TileProviders::PREF_PROVIDER => TileProviders::CUSTOM, TileProviders::PREF_URL => '  ']);
+            $this->expectFlashData(['error_detected' => ['An address is required to use your own background map.']]);
+            $this->preferences->load();
+            $this->assertSame('osm', TileProviders::resolve($this->preferences)['id']);
+
+            //unticked vector box is not posted
+            $store([
+                TileProviders::PREF_PROVIDER => TileProviders::CUSTOM,
+                TileProviders::PREF_URL => 'https://tiles.example.org/{z}/{x}/{y}.png',
+                TileProviders::PREF_ATTRIBUTION => 'Example',
+                TileProviders::PREF_MAXZOOM => '17',
+                TileProviders::PREF_SUBDOMAINS => '',
+            ]);
+            $this->expectFlashData(['success_detected' => ['Maps settings have been saved.']]);
+            $this->preferences->load();
+            $tiles = TileProviders::resolve($this->preferences);
+            $this->assertSame(TileProviders::CUSTOM, $tiles['id']);
+            $this->assertFalse($tiles['vector']);
+            $this->assertSame('https://tiles.example.org/{z}/{x}/{y}.png', $tiles['url']);
+            $this->assertSame(17, $tiles['maxzoom']);
+
+            //out of range zoom is refused
+            $store([
+                TileProviders::PREF_PROVIDER => TileProviders::CUSTOM,
+                TileProviders::PREF_URL => 'https://tiles.example.org/{z}/{x}/{y}.png',
+                TileProviders::PREF_MAXZOOM => '30',
+            ]);
+            //core has no range error message
+            $this->expectFlashData(['error_detected' => ['- Value for \'pref_maps_tiles_maxzoom\' must be a positive number!']]);
+            $this->preferences->load();
+            $this->assertSame(17, TileProviders::resolve($this->preferences)['maxzoom']);
+        } finally {
+            foreach (TileProviders::getSchema() as $name => $schema) {
+                $this->preferences->setValue($name, $schema['default'], $this->login);
+            }
+        }
     }
 
     /**

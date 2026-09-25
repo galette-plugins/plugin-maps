@@ -255,18 +255,21 @@ class MapsController extends AbstractPluginController
             }
         }
 
-        $stored = true;
+        //each call resets errors of the previous one
+        $errors = [];
         foreach ($values as $name => $value) {
-            $stored = $this->preferences->setValue($name, $value, $this->login) && $stored;
+            if (!$this->preferences->setValue($name, $value, $this->login)) {
+                $errors = array_merge($errors, $this->preferences->getErrors());
+            }
         }
 
-        if ($stored) {
+        if (count($errors) === 0) {
             $this->flash->addMessage(
                 'success_detected',
                 _T('Maps settings have been saved.', 'maps')
             );
         } else {
-            foreach ($this->preferences->getErrors() as $error) {
+            foreach ($errors as $error) {
                 $this->flash->addMessage('error_detected', $error);
             }
         }
