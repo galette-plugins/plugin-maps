@@ -17,7 +17,7 @@ require_once $module['root'] . '/_config.inc.php';
 $check_js_middleware = function (\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler) use ($container) {
     //check if JS has been generated
     if (!file_exists(__DIR__ . '/webroot/maps-main.bundle.min.js')) {
-        $container->get('flash')->addMessageNow(
+        $container->get(\Slim\Flash\Messages::class)->addMessageNow(
             'error_detected',
             _T('Javascript libraries has not been built!', 'maps')
         );
