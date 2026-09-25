@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 16:34+0200\n"
+"POT-Creation-Date: 2026-09-25 04:16+0200\n"
 "PO-Revision-Date: 2026-01-28 15:00+0000\n"
 "Last-Translator: giuse17ita <giuseppebranca17@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/galette/maps-"
@@ -118,7 +118,7 @@ msgid "Esri, light grey"
 msgstr ""
 
 #: ../lib/GaletteMaps/TileProviders.php:130
-#: ../tempcache/maps_preferences.html.twig:80
+#: ../templates/default/maps_preferences.html.twig:22
 msgid "Your own values"
 msgstr ""
 
@@ -137,143 +137,147 @@ msgstr "Geolocalizza"
 msgid "Geolocalize %1$s"
 msgstr "Geolocalizza %1$s"
 
-#: ../tempcache/maps.html.twig:115
+#: ../templates/default/maps.html.twig:28
 msgid "aka"
 msgstr "Alias"
 
-#: ../tempcache/common_scripts.html.twig:166
+#: ../templates/default/common_scripts.html.twig:84
 msgid "An error occurred during 'I live here' process :("
 msgstr "Si è verificato un errore durante il processo \"Io vivo qui\" :("
 
-#: ../tempcache/common_scripts.html.twig:215
+#: ../templates/default/common_scripts.html.twig:104
 msgid "Display map in full screen"
 msgstr "Visualizza la mappa a schermo intero"
 
-#: ../tempcache/common_scripts.html.twig:219
+#: ../templates/default/common_scripts.html.twig:105
 msgid "Exit full screen"
 msgstr "Esci da schermo intero"
 
-#: ../tempcache/common_scripts.html.twig:231
+#: ../templates/default/common_scripts.html.twig:112
 msgid "Search your town..."
 msgstr "Cerca la tua città ..."
 
-#: ../tempcache/common_scripts.html.twig:237
+#: ../templates/default/common_scripts.html.twig:114
 msgid "Search a town..."
 msgstr "Cerca una città ..."
 
-#: ../tempcache/common_scripts.html.twig:243
+#: ../templates/default/common_scripts.html.twig:116
 msgid "Sorry, that town could not be found."
 msgstr "Spiacente, quella città non è stata trovata."
 
-#: ../tempcache/common_scripts.html.twig:247
+#: ../templates/default/common_scripts.html.twig:117
 msgid "Search"
 msgstr "Cerca"
 
-#: ../tempcache/common_scripts.html.twig:271
+#: ../templates/default/common_scripts.html.twig:132
 msgid "Show me where I am"
 msgstr "Mostrami dove mi trovo"
 
-#: ../tempcache/common_scripts.html.twig:276
+#: ../templates/default/common_scripts.html.twig:134
 msgid "You seem located outside the boundaries of the map"
 msgstr "Sembra che ti trovi al di fuori dei confini della mappa"
 
-#: ../tempcache/maps_preferences.html.twig:68
+#: ../templates/default/maps_preferences.html.twig:15
 msgid "Background map provider"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:86
+#: ../templates/default/maps_preferences.html.twig:27
 msgid "Vector tiles"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:86
+#: ../templates/default/maps_preferences.html.twig:27
 msgid "Tick for a MapLibre style, leave unticked for classic raster tiles."
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:93
+#: ../templates/default/maps_preferences.html.twig:35
 msgid "Address"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:93
+#: ../templates/default/maps_preferences.html.twig:35
 msgid "Style address for vector tiles, tiles address for raster ones, such as:"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:99
+#: ../templates/default/maps_preferences.html.twig:42
 msgid "Attribution"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:99
+#: ../templates/default/maps_preferences.html.twig:42
 msgid ""
 "Credit the provider requires, HTML allowed. Data licences make it mandatory."
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:105
+#: ../templates/default/maps_preferences.html.twig:49
 msgid "Maximum zoom"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:111
+#: ../templates/default/maps_preferences.html.twig:57
 msgid "Subdomains"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:111
+#: ../templates/default/maps_preferences.html.twig:57
 msgid ""
 "Letters the {s} token in the address is replaced with, such as abc. Raster "
 "tiles only."
 msgstr ""
 
-#: ../tempcache/mymap.html.twig:73
+#: ../templates/default/mymap.html.twig:16
 msgid "Choose your location"
 msgstr "Scegli la tua posizione"
 
-#: ../tempcache/mymap.html.twig:79
+#: ../templates/default/mymap.html.twig:18
 #, php-format
 msgid "Choose %1$s location"
 msgstr "Scegli posizione del %1$s"
 
-#: ../tempcache/mymap.html.twig:89
+#: ../templates/default/mymap.html.twig:23
 msgid "Select your town."
 msgstr "Seleziona la tua città."
 
-#: ../tempcache/mymap.html.twig:93
+#: ../templates/default/mymap.html.twig:24
 #, php-format
 msgid "In the database, town is set to: '%1$s'"
 msgstr "Nel database, la città è impostata su: '%1$s'"
 
-#: ../tempcache/mymap.html.twig:188
+#: ../templates/default/mymap.html.twig:80
 #, php-format
 msgid "You clicked at %1$s"
 msgstr "Hai fatto clic su %1$s"
 
-#: ../tempcache/mymap.html.twig:191 ../tempcache/mymap.html.twig:312
-#: ../tempcache/mymap.html.twig:341
+#: ../templates/default/mymap.html.twig:80
+#: ../templates/default/mymap.html.twig:153
+#: ../templates/default/mymap.html.twig:170
 msgid "I live here!"
 msgstr "Io vivo qui!"
 
-#: ../tempcache/mymap.html.twig:193 ../tempcache/mymap.html.twig:314
-#: ../tempcache/mymap.html.twig:343
+#: ../templates/default/mymap.html.twig:80
+#: ../templates/default/mymap.html.twig:153
+#: ../templates/default/mymap.html.twig:170
 msgid "Member lives here!"
 msgstr "L'utente vive qui!"
 
-#: ../tempcache/mymap.html.twig:225
+#: ../templates/default/mymap.html.twig:98
 msgid "Remove my coordinates"
 msgstr "Rimuovi le mie coordinate"
 
-#: ../tempcache/mymap.html.twig:227
+#: ../templates/default/mymap.html.twig:98
 msgid "Remove member coordinates"
 msgstr "Rimuovi le coordinate dell'utente"
 
-#: ../tempcache/mymap.html.twig:233
+#: ../templates/default/mymap.html.twig:100
 msgid "Are you sure you want to remove coordinates from the database?"
 msgstr "Sei sicuro di voler rimuovere le coordinate dal database?"
 
-#: ../tempcache/mymap.html.twig:286
+#: ../templates/default/mymap.html.twig:136
 msgid "An error occurred removing coordinates :("
 msgstr "Si è verificato un errore durante la rimozione delle coordinate :("
 
-#: ../tempcache/common_html.html.twig:68 ../tempcache/common_html.html.twig:74
+#: ../templates/default/common_html.html.twig:19
+#: ../templates/default/common_html.html.twig:22
 msgid "Member (company)"
 msgstr "Utente (Azienda)"
 
-#: ../tempcache/common_html.html.twig:84 ../tempcache/common_html.html.twig:90
+#: ../templates/default/common_html.html.twig:27
+#: ../templates/default/common_html.html.twig:30
 msgid "Search result"
 msgstr "Risultato di ricerca"
 

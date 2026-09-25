@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: translations@galette.eu\n"
-"POT-Creation-Date: 2026-09-02 16:34+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 04:16+0200\n"
 "PO-Revision-Date: 2026-09-23 14:07+0000\n"
 "Last-Translator: Jože Felicijan <joze@felicijan.com>\n"
 "Language-Team: Slovenian <https://hosted.weblate.org/projects/galette/maps-"
@@ -110,7 +110,7 @@ msgid "Esri, light grey"
 msgstr "Esri, svetlo siva"
 
 #: ../lib/GaletteMaps/TileProviders.php:130
-#: ../tempcache/maps_preferences.html.twig:80
+#: ../templates/default/maps_preferences.html.twig:22
 msgid "Your own values"
 msgstr "Vaše lastne vrednote"
 
@@ -129,85 +129,86 @@ msgstr "Geolokaliziraj"
 msgid "Geolocalize %1$s"
 msgstr "Geolokaliziraj %1$s"
 
-#: ../tempcache/maps.html.twig:115
+#: ../templates/default/maps.html.twig:28
 msgid "aka"
 msgstr "oz."
 
-#: ../tempcache/common_scripts.html.twig:166
+#: ../templates/default/common_scripts.html.twig:84
 msgid "An error occurred during 'I live here' process :("
 msgstr "Med postopkom »Živim tukaj« je prišlo do napake :("
 
-#: ../tempcache/common_scripts.html.twig:215
+#: ../templates/default/common_scripts.html.twig:104
 msgid "Display map in full screen"
 msgstr "Prikaži zemljevid v celozaslonskem načinu"
 
-#: ../tempcache/common_scripts.html.twig:219
+#: ../templates/default/common_scripts.html.twig:105
 msgid "Exit full screen"
 msgstr "Izhod iz celozaslonskega načina"
 
-#: ../tempcache/common_scripts.html.twig:231
+#: ../templates/default/common_scripts.html.twig:112
 msgid "Search your town..."
 msgstr "Poiščite svoje mesto ..."
 
-#: ../tempcache/common_scripts.html.twig:237
+#: ../templates/default/common_scripts.html.twig:114
 msgid "Search a town..."
 msgstr "Iskanje mesta ..."
 
-#: ../tempcache/common_scripts.html.twig:243
+#: ../templates/default/common_scripts.html.twig:116
 msgid "Sorry, that town could not be found."
 msgstr "Žal tega mesta ni bilo mogoče najti."
 
-#: ../tempcache/common_scripts.html.twig:247
+#: ../templates/default/common_scripts.html.twig:117
 msgid "Search"
 msgstr "Iskanje"
 
-#: ../tempcache/common_scripts.html.twig:271
+#: ../templates/default/common_scripts.html.twig:132
 msgid "Show me where I am"
 msgstr "Pokaži mi, kje sem"
 
-#: ../tempcache/common_scripts.html.twig:276
+#: ../templates/default/common_scripts.html.twig:134
 msgid "You seem located outside the boundaries of the map"
 msgstr "Zdi se, da se nahajaš zunaj meja zemljevida"
 
-#: ../tempcache/maps_preferences.html.twig:68
+#: ../templates/default/maps_preferences.html.twig:15
 msgid "Background map provider"
 msgstr "Ponudnik zemljevidov v ozadju"
 
-#: ../tempcache/maps_preferences.html.twig:86
+#: ../templates/default/maps_preferences.html.twig:27
 msgid "Vector tiles"
 msgstr "Vektorske ploščice"
 
-#: ../tempcache/maps_preferences.html.twig:86
+#: ../templates/default/maps_preferences.html.twig:27
 msgid "Tick for a MapLibre style, leave unticked for classic raster tiles."
 msgstr ""
 "Označite za slog MapLibre, pustite neoznačeno za klasične rastrske ploščice."
 
-#: ../tempcache/maps_preferences.html.twig:93
+#: ../templates/default/maps_preferences.html.twig:35
 msgid "Address"
 msgstr "Naslov"
 
-#: ../tempcache/maps_preferences.html.twig:93
+#: ../templates/default/maps_preferences.html.twig:35
 msgid "Style address for vector tiles, tiles address for raster ones, such as:"
-msgstr "Naslov sloga za vektorske ploščice, naslov ploščic za rastrske, kot so:"
+msgstr ""
+"Naslov sloga za vektorske ploščice, naslov ploščic za rastrske, kot so:"
 
-#: ../tempcache/maps_preferences.html.twig:99
+#: ../templates/default/maps_preferences.html.twig:42
 msgid "Attribution"
 msgstr "Pripisovanje"
 
-#: ../tempcache/maps_preferences.html.twig:99
+#: ../templates/default/maps_preferences.html.twig:42
 msgid ""
 "Credit the provider requires, HTML allowed. Data licences make it mandatory."
 msgstr "Kredit ponudnik zahteva, HTML dovoljen. Podatkovne licence so obvezne."
 
-#: ../tempcache/maps_preferences.html.twig:105
+#: ../templates/default/maps_preferences.html.twig:49
 msgid "Maximum zoom"
 msgstr "Največja povečava"
 
-#: ../tempcache/maps_preferences.html.twig:111
+#: ../templates/default/maps_preferences.html.twig:57
 msgid "Subdomains"
 msgstr "Poddomene"
 
-#: ../tempcache/maps_preferences.html.twig:111
+#: ../templates/default/maps_preferences.html.twig:57
 msgid ""
 "Letters the {s} token in the address is replaced with, such as abc. Raster "
 "tiles only."
@@ -215,60 +216,64 @@ msgstr ""
 "Črke, s katerimi je zamenjan žeton {s} v naslovu, na primer abc. Samo "
 "rastrske ploščice."
 
-#: ../tempcache/mymap.html.twig:73
+#: ../templates/default/mymap.html.twig:16
 msgid "Choose your location"
 msgstr "Izberite svojo lokacijo"
 
-#: ../tempcache/mymap.html.twig:79
+#: ../templates/default/mymap.html.twig:18
 #, php-format
 msgid "Choose %1$s location"
 msgstr "Izberite lokacijo %1$s"
 
-#: ../tempcache/mymap.html.twig:89
+#: ../templates/default/mymap.html.twig:23
 msgid "Select your town."
 msgstr "Izberite svoje mesto."
 
-#: ../tempcache/mymap.html.twig:93
+#: ../templates/default/mymap.html.twig:24
 #, php-format
 msgid "In the database, town is set to: '%1$s'"
 msgstr "V podatkovni bazi je mesto nastavljeno na: '%1$s'"
 
-#: ../tempcache/mymap.html.twig:188
+#: ../templates/default/mymap.html.twig:80
 #, php-format
 msgid "You clicked at %1$s"
 msgstr "Kliknili ste ob %1$s"
 
-#: ../tempcache/mymap.html.twig:191 ../tempcache/mymap.html.twig:312
-#: ../tempcache/mymap.html.twig:341
+#: ../templates/default/mymap.html.twig:80
+#: ../templates/default/mymap.html.twig:153
+#: ../templates/default/mymap.html.twig:170
 msgid "I live here!"
 msgstr "Živim tukaj!"
 
-#: ../tempcache/mymap.html.twig:193 ../tempcache/mymap.html.twig:314
-#: ../tempcache/mymap.html.twig:343
+#: ../templates/default/mymap.html.twig:80
+#: ../templates/default/mymap.html.twig:153
+#: ../templates/default/mymap.html.twig:170
 msgid "Member lives here!"
 msgstr "Član živi tukaj!"
 
-#: ../tempcache/mymap.html.twig:225
+#: ../templates/default/mymap.html.twig:98
 msgid "Remove my coordinates"
 msgstr "Odstrani moje koordinate"
 
-#: ../tempcache/mymap.html.twig:227
+#: ../templates/default/mymap.html.twig:98
 msgid "Remove member coordinates"
 msgstr "Odstrani koordinate člana"
 
-#: ../tempcache/mymap.html.twig:233
+#: ../templates/default/mymap.html.twig:100
 msgid "Are you sure you want to remove coordinates from the database?"
 msgstr "Ali ste prepričani, da želite odstraniti koordinate iz baze podatkov?"
 
-#: ../tempcache/mymap.html.twig:286
+#: ../templates/default/mymap.html.twig:136
 msgid "An error occurred removing coordinates :("
 msgstr "Pri odstranjevanju koordinat je prišlo do napake :("
 
-#: ../tempcache/common_html.html.twig:68 ../tempcache/common_html.html.twig:74
+#: ../templates/default/common_html.html.twig:19
+#: ../templates/default/common_html.html.twig:22
 msgid "Member (company)"
 msgstr "Član (podjetje)"
 
-#: ../tempcache/common_html.html.twig:84 ../tempcache/common_html.html.twig:90
+#: ../templates/default/common_html.html.twig:27
+#: ../templates/default/common_html.html.twig:30
 msgid "Search result"
 msgstr "Rezultat iskanja"
 
