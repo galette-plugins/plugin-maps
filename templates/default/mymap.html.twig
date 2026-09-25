@@ -30,7 +30,7 @@
             <ul>
         {% for t in towns %}
                 <li>
-                    <div class="ui labeled fluid button">
+                    <div class="ui labeled fluid button maps-town" data-name="{{ t.full_name }}" data-lat="{{ t.latitude }}" data-lng="{{ t.longitude }}">
                         <div class="ui green button city">
                             {{ t.full_name }}
                         </div>
@@ -50,129 +50,14 @@
 {% endblock %}
 
 {% block javascripts %}
-{% include '@PluginGaletteMaps/common_scripts.html.twig' %}
-{% if cur_route != 'maps_map' %}
-<script type="text/javascript">
-    var _mapsBinded = function(map)
-    {
-
-{% if can_edit %}
-        function onMapClick(e) {
-            var popup = L.popup();
-            popup
-                .setLatLng(e.latlng)
-                .setContent('SELECTPOPUP')
-                .openOn(map);
-        }
-
-        map.on('click', onMapClick);
-
-        //bind "I live here" event on popupopen
-        map.on('popupopen', function(e){
-            var _popup = e.popup;
-            var _container = $(_popup._container);
-            if ( _container.find('#removecoords').length > 0 ) {
-                _bind_removecoords();
-            } else if ( _container.find('.leaflet-popup-content').html() == 'SELECTPOPUP' ) {
-                var _clat = _popup._latlng.lat.toString();
-                var _clng = _popup._latlng.lng.toString();
-                var _id = 'coords';
-
-                _popup.setContent('<p>' + '{{ _T("You clicked at %p", "maps")|e("js") }}'.replace('%p', '<em>' + _clat + '/' + _clng + '</em>') + '</p><p><a class="ilivehere ui button" id="' + _id + '" href="#">{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}</a></p>');
+    {% include '@PluginGaletteMaps/common_scripts.html.twig' with {
+        page_config: {
+            member: {
+                name: member.sfullname,
+                can_edit: can_edit,
+                position: town ?? null,
+                store_url: mymap is defined ? url_for("maps_ilivehere") : url_for("maps_ilivehere", {"id": member.id})
             }
-
-            var _links = $(_container).find('a.ilivehere');
-            _a = $(_links[0]);
-            _a.data('latlng', e.popup._latlng);
-            _iLiveHere(_a.attr('id'));
-        });
-{% endif %}
-
-
-{% if town is defined %}
-        {# Town is known, just display #}
-        var _lat = {{ town['latitude'] }};
-        var _lon = {{ town['longitude'] }};
-
-        var _bind_removecoords = function(){
-            $('#removecoords').click(function(){
-                $('body').modal({
-                    title: '{% if mymap is defined %}{{ _T("Remove my coordinates", "maps")|e("js") }}{% else %}{{ _T("Remove member coordinates", "maps")|e("js") }}{% endif %}',
-                    class: 'tiny',
-                    content: '{{ _T("Are you sure you want to remove coordinates from the database?", "maps")|e("js") }}',
-                    actions: [{
-                        text    : '{{ _T("Remove")|e('js') }}',
-                        class   : 'red confirm_remove',
-                        icon    : 'trash alt',
-                        click   : function() {
-                            $.ajax({
-                                url: '{% if mymap is defined %}{{ url_for("maps_ilivehere") }}{% else %}{{ url_for("maps_ilivehere", {"id": member.id}) }}{% endif %}',
-                                type: 'POST',
-                                data: {
-                                    remove: true
-                                },
-                                {% include "elements/js/loader.js.twig" with {
-                                        selector: '.confirm_remove',
-                                        loader: 'button'
-                                } %},
-                                success: function(res){
-                                    setTimeout(function() {
-                                        $('body').modal({
-                                            class: 'tiny',
-                                            content: res.message,
-                                            actions: [{
-                                                text    : '{{ _T("Close")|e('js') }}',
-                                                click   : function() {
-                                                    window.location.reload();
-                                                }
-                                            }],
-                                            className: {
-                                                'title': 'center aligned header',
-                                                'content': 'center aligned content',
-                                                'actions': 'center aligned actions'
-                                            },
-                                        }).modal('show');
-                                    }, "500")
-                                },
-                                error: function(xhr) {
-                                    window.alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "{{ _T("An error occurred removing coordinates :(", "maps")|e('js') }}");
-                                }
-                            });
-                        }
-                    }, {
-                        text    : '{{ _T("Close")|e('js') }}'
-                    }],
-                    className: {
-                        'title': 'center aligned header',
-                        'content': 'center aligned content',
-                        'actions': 'center aligned actions'
-                    },
-                }).modal('show');
-            });
-        };
-
-        L.marker([_lat, _lon], {icon: galetteIcon}).addTo(map)
-            .bindPopup('<strong>{{ member.sfullname|e|e("js") }}</strong><br/>{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}{% if can_edit %}<br/><span id="removecoords" class="ui button">{{ _T("Remove")|e("js") }}</span>{% endif %}').openPopup();
-{% else %}
-        {# Town is not known. Show possibilities #}
-        var _towns = $('#possible_towns');
-
-        _towns.modal('show');
-
-        _towns.find('.button').click(function(e){
-            var _elt = $(this);
-            var _name = _elt.find('.city')[0].innerHTML;
-            var _slat = _elt.find('.lat')[0].innerHTML;
-            var _slon = _elt.find('.lon')[0].innerHTML;
-
-            map.setView([parseFloat(_slat), parseFloat(_slon)], 13);
-            var _id = 'coords';
-            _towns.modal('hide');
-            L.marker([_slat, _slon]).addTo(map)
-                .bindPopup('<p><strong>' + _name  + '</strong><br/><em>' + _slat + '/' + _slon + '</em></p><p><a class="ilivehere ui button" id="' + _id + '" href="#">{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}</a></p>').openPopup();
-        });
-{% endif %}
-    }
-</script>
-{% endif %}
+        }
+    } %}
 {% endblock %}

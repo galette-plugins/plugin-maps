@@ -18,7 +18,7 @@
             } %}
         </div>
 
-        <div class="ui segment{% if provider != custom %} displaynone{% endif %}" id="maps_custom_tiles">
+        <div class="ui segment{% if provider != custom %} displaynone{% endif %}" id="maps_custom_tiles" data-custom="{{ custom }}">
             <h3 class="ui header">{{ _T("Your own values", "maps") }}</h3>
 
             {% include "components/forms/checkbox.html.twig" with {
@@ -70,12 +70,5 @@
 {% endblock %}
 
 {% block javascripts %}
-<script type="text/javascript">
-    $(function(){
-        var _custom = $('#maps_custom_tiles');
-        $('#pref_maps_tiles_provider').on('change', function(){
-            _custom.toggleClass('displaynone', this.value !== '{{ custom|e("js") }}');
-        });
-    });
-</script>
+    <script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "galette_maps.js"}) }}"></script>
 {% endblock %}

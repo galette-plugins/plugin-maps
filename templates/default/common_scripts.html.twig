@@ -15,157 +15,35 @@
     <script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "maps-locate.bundle.min.js"}) }}"></script>
 {% endif %}
 
-<script type="text/javascript">
-    /**
-     * Galette specific marker icon
-     */
-    const galetteIcon = L.icon({
-        iconUrl: '{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette.png"}) }}',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-    const galetteProIcon = L.icon({
-        iconUrl: '{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette-pro.png"}) }}',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-
-{% if tiles.vector %}
-    /**
-     * Vector tiles need WebGL 2; without it we fall back to raster tiles
-     */
-    function _hasWebGL2(){
-        try {
-            return !!(window.WebGL2RenderingContext && document.createElement('canvas').getContext('webgl2'));
-        } catch (err) {
-            return false;
-        }
+{% set is_member_page = cur_route == 'maps_localize_member' or cur_route == 'maps_mymap' %}
+{% set maps_config = {
+    icons: {
+        member: url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette.png"}),
+        company: url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette-pro.png"})
+    },
+    tiles: tiles,
+    center: town is defined ? {lat: town['latitude'], lng: town['longitude'], zoom: 12} : {lat: 46.830133640447386, lng: 2.4609375, zoom: 6},
+    locate: is_member_page,
+    strings: {
+        close: _T("Close"),
+        legend: _T("Legend"),
+        remove: _T("Remove"),
+        fullscreen: _T("Display map in full screen", "maps"),
+        fullscreen_exit: _T("Exit full screen", "maps"),
+        search_placeholder: (cur_route == 'maps_localize_member' and town is not defined) ? _T("Search your town...", "maps") : _T("Search a town...", "maps"),
+        search_error: _T("Sorry, that town could not be found.", "maps"),
+        search: _T("Search", "maps"),
+        locate: _T("Show me where I am", "maps"),
+        locate_outside: _T("You seem located outside the boundaries of the map", "maps"),
+        aka: _T("aka", "maps"),
+        clicked_at: _T("You clicked at %p", "maps"),
+        lives_here: mymap is defined ? _T("I live here!", "maps") : _T("Member lives here!", "maps"),
+        remove_title: mymap is defined ? _T("Remove my coordinates", "maps") : _T("Remove member coordinates", "maps"),
+        remove_confirm: _T("Are you sure you want to remove coordinates from the database?", "maps"),
+        store_error: _T("An error occurred during 'I live here' process :(", "maps"),
+        remove_error: _T("An error occurred removing coordinates :(", "maps")
     }
-{% endif %}
-
-{% if cur_route != 'maps_map' %}
-    function _iLiveHere(_id){
-        $('#' + _id).click(function(e, f,g){
-            var _a = $(this);
-            //a click on a copy of the world gives a longitude beyond 180
-            var _latlng = _a.data('latlng').wrap();
-            $.ajax({
-                url: '{% if mymap is defined %}{{ url_for("maps_ilivehere") }}{% else %}{{ url_for("maps_ilivehere", {"id": member.id}) }}{% endif %}',
-                type: 'POST',
-                data: {
-                    latitude: _latlng.lat,
-                    longitude: _latlng.lng
-                },
-                {% include "elements/js/loader.js.twig" with {
-                    selector: '#coords',
-                    loader: 'button'
-                } %},
-                success: function(res){
-                    $('body').modal({
-                        class: 'tiny',
-                        content: res.message,
-                        actions: [{
-                            text    : '{{ _T("Close")|e('js') }}',
-                            click   : function() {
-                                window.location.reload();
-                            }
-                        }],
-                        className: {
-                            'title': 'center aligned header',
-                            'content': 'center aligned content',
-                            'actions': 'center aligned actions'
-                        },
-                    }).modal('show');
-                },
-                error: function(xhr){
-                    alert(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : "{{ _T("An error occurred during 'I live here' process :(", "maps")|e("js") }}");
-                }
-            });
-            return false;
-        });
-    }
-{% endif %}
-
-    $(function(){
-        var _lat = {% if town is defined %}{{ town['latitude'] }}{% else %}46.830133640447386{% endif %};
-        var _lon = {% if town is defined %}{{ town['longitude'] }}{% else %}2.4609375{% endif %};
-        var map = L.map(
-            'map', {
-                gestureHandling: true,
-                maxZoom: {{ tiles.maxzoom }}
-            }
-        ).setView([_lat, _lon], {% if town is defined %}12{% else %}6{% endif %});
-
-        new L.Control.FullScreen({
-            position: 'topleft',
-            title: "{{ _T("Display map in full screen", "maps")|e("js") }}",
-            titleCancel:"{{ _T("Exit full screen", "maps")|e("js") }}",
-            forceSeparateButton: true
-        }).addTo(map);
-
-        var _geocoder = {
-            collapsed: false,
-{% if cur_route == 'maps_localize_member' and town is not defined %}
-            placeholder: '{{ _T("Search your town...", "maps")|e("js") }}',
-{% else %}
-            placeholder: '{{ _T("Search a town...", "maps")|e("js") }}',
-{% endif %}
-            errorMessage: '{{ _T("Sorry, that town could not be found.", "maps")|e("js") }}',
-            iconLabel: '{{ _T("Search", "maps")|e("js") }}',
-        };
-        L.Control.geocoder(_geocoder).addTo(map);
-
-        var _legend =  new L.Control.Legend({
-            position: 'topright',
-        });
-        map.addControl(_legend);
-
-        $('.legend-container').append( $('#legend') );
-        $('.legend-toggle').append( '<span class="legend-toggle-icon"><i class="big info circle blue icon"></i> {{ _T("Legend") }}</span>' );
-
-{% if cur_route == 'maps_localize_member' or cur_route == 'maps_mymap' %}
-        L.control.locate({
-            strings: {
-                title: '{{ _T("Show me where I am", "maps")|e("js") }}',
-                popup: 'SELECTPOPUP',
-                outsideMapBoundsMsg: '{{ _T("You seem located outside the boundaries of the map", "maps")|e("js") }}'
-            }
-        }).addTo(map);
-{% endif %}
-
-{% if tiles.vector %}
-        if (_hasWebGL2()) {
-            L.maplibreGL({
-                style: '{{ tiles.url|e("js") }}'{% if tiles.attribution != '' %},
-                {# given one, it wins; otherwise the bridge reads it off the style sources #}
-                attributionControl: {customAttribution: '{{ tiles.attribution|e("js") }}'}{% endif %}
-            }).addTo(map);
-        } else {
-            L.tileLayer('{{ tiles.fallback.url|e("js") }}', {
-                maxZoom: {{ tiles.fallback.maxzoom }},
-                attribution: '{{ tiles.fallback.attribution|e("js") }}'
-            }).addTo(map);
-        }
-{% else %}
-        L.tileLayer('{{ tiles.url|e("js") }}', {
-            maxZoom: {{ tiles.maxzoom }},
-{% if tiles.subdomains != '' %}
-            subdomains: '{{ tiles.subdomains|e("js") }}',
-{% endif %}
-            attribution: '{{ tiles.attribution|e("js") }}'
-        }).addTo(map);
-{% endif %}
-
-        try {
-            _mapsBinded(map);
-        } catch (err) {
-            //fortunately, nothing to do here.
-            //_mapsBinded function can be missing
-        }
-    });
-</script>
-
+}|merge(page_config ?? {}) %}
+{# HEX flags keep "</script>" and friends harmless inside the script element #}
+<script type="application/json" id="maps-config">{{ maps_config|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_HEX_APOS') b-or constant('JSON_HEX_QUOT'))|raw }}</script>
+<script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "galette_maps.js"}) }}"></script>

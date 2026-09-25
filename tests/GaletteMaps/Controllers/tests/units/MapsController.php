@@ -63,6 +63,24 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Get maps configuration the page gives to its script
+     *
+     * @param string $body Page body
+     *
+     * @return array<string, mixed>
+     */
+    private function getMapsConfig(string $body): array
+    {
+        $this->assertSame(
+            1,
+            preg_match('@<script type="application/json" id="maps-config">(.*?)</script>@s', $body, $matches)
+        );
+        $config = json_decode($matches[1], true, flags: JSON_THROW_ON_ERROR);
+        $this->assertIsArray($config);
+        return $config;
+    }
+
+    /**
      * Post coordinates for a member
      *
      * @param ?int                 $id_adh Member ID, null for logged-in one
@@ -299,24 +317,26 @@ class MapsController extends GaletteRoutingTestCase
         $request = $this->createRequest('maps_localize_member', ['id' => (string)$member_one->id]);
         $test_response = $this->app->handle($request);
         $this->assertSame(200, $test_response->getStatusCode());
-        $body = (string)$test_response->getBody();
-        $this->assertStringContainsString('48.850000', $body);
-        $this->assertStringNotContainsString('id="removecoords"', $body);
-        $this->assertStringNotContainsString('onMapClick', $body);
+        $member = $this->getMapsConfig((string)$test_response->getBody())['member'];
+        $this->assertSame(['latitude' => '48.850000', 'longitude' => '2.350000'], $member['position']);
+        $this->assertFalse($member['can_edit']);
 
         $this->preferences->pref_bool_groupsmanagers_edit_member = true;
         $test_response = $this->app->handle($request);
         $this->assertSame(200, $test_response->getStatusCode());
-        $body = (string)$test_response->getBody();
-        $this->assertStringContainsString('id="removecoords"', $body);
-        $this->assertStringContainsString('onMapClick', $body);
+        $member = $this->getMapsConfig((string)$test_response->getBody())['member'];
+        $this->assertTrue($member['can_edit']);
+        $this->assertSame(
+            $this->routeparser->urlFor('maps_ilivehere', ['id' => (string)$member_one->id]),
+            $member['store_url']
+        );
     }
 
     /**
-     * Nicknames and company names in map popups are not interpreted as HTML
+     * Nicknames and company names reach the script as data, never as markup
      *
      * Member form strips tags, stored values may not have been through it.
-     * Names are safe anyway: Adherent::getNameWithCase() strips tags.
+     * The script shows them as text; the page must not hold them as HTML.
      */
     public function testMapEscapesNames(): void
     {
@@ -333,11 +353,14 @@ class MapsController extends GaletteRoutingTestCase
         $test_response = $this->app->handle($this->createRequest('maps_map'));
         $this->assertSame(200, $test_response->getStatusCode());
         $body = (string)$test_response->getBody();
-        //a JS escaped "<" would be turned back into markup by the popup
-        $this->assertStringNotContainsString('\u003Cb\u003E', $body);
-        $this->assertStringNotContainsString('\u003Cimg', $body);
-        $this->assertStringContainsString('\u0026lt\u003Bb\u0026gt\u003Bnick', $body);
-        $this->assertStringContainsString('\u0026lt\u003Bimg\u0020src', $body);
+        $this->assertStringNotContainsString('<b>', $body);
+        $this->assertStringNotContainsString('<img src=x', $body);
+        $markers = $this->getMapsConfig($body)['markers'];
+        $this->assertCount(1, $markers);
+        $this->assertSame('<b>nick</b>', $markers[0]['nickname']);
+        $this->assertSame('<img src=x onerror=alert(1)>', $markers[0]['company']);
+        //member IDs are not published
+        $this->assertArrayNotHasKey('id_adh', $markers[0]);
     }
 
     /**
@@ -362,10 +385,8 @@ class MapsController extends GaletteRoutingTestCase
         $this->preferences->pref_publicpages_visibility_generic = \Galette\Core\Preferences::PUBLIC_PAGES_VISIBILITY_PUBLIC;
         $test_response = $this->app->handle($request);
         $this->assertSame(200, $test_response->getStatusCode());
-        $body = (string)$test_response->getBody();
-        $this->assertStringContainsString('_mapsBinded', $body);
         //member one does not display its information
-        $this->assertStringNotContainsString('48.850000', $body);
+        $this->assertSame([], $this->getMapsConfig((string)$test_response->getBody())['markers']);
     }
 
     /**
@@ -385,16 +406,19 @@ class MapsController extends GaletteRoutingTestCase
         $this->assertSame(200, $test_response->getStatusCode());
         $body = (string)$test_response->getBody();
         $this->assertStringNotContainsString('id="possible_towns"', $body);
-        $this->assertStringNotContainsString('id="removecoords"', $body);
-        $this->assertStringContainsString('onMapClick', $body);
+        $config = $this->getMapsConfig($body);
+        $this->assertNull($config['member']['position']);
+        $this->assertTrue($config['member']['can_edit']);
+        $this->assertSame($this->routeparser->urlFor('maps_ilivehere'), $config['member']['store_url']);
+        $this->assertTrue($config['locate']);
 
         (new Coordinates($this->zdb, $this->login))->set($member_one->id, 48.85, 2.35);
         $test_response = $this->app->handle($request);
         $this->assertSame(200, $test_response->getStatusCode());
-        $body = (string)$test_response->getBody();
-        $this->assertStringContainsString('var _lat = 48.850000;', $body);
-        $this->assertStringContainsString('id="removecoords"', $body);
-        $this->assertStringContainsString('I\\u0020live\\u0020here\\u0021', $body);
+        $config = $this->getMapsConfig((string)$test_response->getBody());
+        $this->assertSame(['lat' => '48.850000', 'lng' => '2.350000', 'zoom' => 12], $config['center']);
+        $this->assertSame(['latitude' => '48.850000', 'longitude' => '2.350000'], $config['member']['position']);
+        $this->assertSame('I live here!', $config['strings']['lives_here']);
     }
 
     /**

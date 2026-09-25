@@ -14,35 +14,9 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% include '@PluginGaletteMaps/common_scripts.html.twig' %}
-<script type="text/javascript">
-    var _mapsBinded = function(map)
-    {
-        var _markers = [];
-{% for l in list %}
-    {% if l.company is defined and l.company != '' %}
-        {% set icon = 'galetteProIcon' %}
-    {% else %}
-        {% set icon = 'galetteIcon' %}
-    {% endif %}
-        _member = [{{ l.lat }}, {{ l.lng }}, {{ icon }}, '<p><strong>{{ l.name|e|e("js") }}</strong>{% if l.nickname != '' %} {{ _T("aka", "maps")|e("js") }} <em>{{ l.nickname|e|e("js") }}</em>{% endif %}{% if l.company is defined %}<br/>{{ l.company|e|e("js") }}{% endif %}</p>'];
-        _markers.push(_member);
-{% endfor %}
-        var _group = L.markerClusterGroup();
-        for (var i = 0; i < _markers.length; i++) {
-            var _a = _markers[i];
-            var _title = _a[3];
-            var _icon = _a[2];
-            var _marker = L.marker(new L.LatLng(_a[0], _a[1]), { icon: _icon });
-            _marker.bindPopup(_title);
-            _group.addLayer(_marker);
+    {% include '@PluginGaletteMaps/common_scripts.html.twig' with {
+        page_config: {
+            markers: list|map(l => {lat: l.lat, lng: l.lng, name: l.name, nickname: l.nickname, company: l.company ?? null})
         }
-        map.addLayer(_group).fitBounds(
-            _group.getBounds(), {
-                padding: [50, 50],
-                maxZoom: 12
-            }
-        );
-    }
-</script>
+    } %}
 {% endblock %}

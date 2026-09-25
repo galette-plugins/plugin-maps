@@ -75,6 +75,7 @@ function clean(cb) {
     plugin.public + '/**',
     '!' + plugin.public,
     '!' + plugin.public + '/galette_maps.css',
+    '!' + plugin.public + '/galette_maps.js',
     plugin.public + '/images/**',
     '!' + plugin.public + '/images',
     '!' + plugin.public + '/images/marker-galette.png',
