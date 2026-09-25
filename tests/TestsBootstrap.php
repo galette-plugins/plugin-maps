@@ -9,13 +9,13 @@
 declare(strict_types=1);
 
 /**
- * Bootstrap tests file for Galette Auto plugin
+ * Bootstrap tests file for Galette Maps plugin
  *
  * @author Johan Cwiklinski <johan@x-tnd.be>
  */
 
 define('GALETTE_PLUGINS_PATH', __DIR__ . '/../../');
-$basepath = '../../../galette/'; // phpcs:ignore SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable -- used from Core testBootstrap
+$basepath = __DIR__ . '/../../../'; // phpcs:ignore SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable -- used from Core testBootstrap
 
-include_once '../../../tests/TestsBootstrap.php';
+include_once __DIR__ . '/../../../../tests/TestsBootstrap.php';
 require_once __DIR__ . '/../_config.inc.php';
