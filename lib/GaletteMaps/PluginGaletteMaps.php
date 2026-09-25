@@ -30,7 +30,9 @@ use Galette\Core\GalettePlugin;
 class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, MenuProviderInterface, DashboardProviderInterface, MemberActionProviderInterface, PreferencesProviderInterface
 {
     #[Inject]
-    private readonly Db $zdb; //@phpstan-ignore-line injected from DI
+    private readonly Db $zdb; //@phpstan-ignore property.uninitializedReadonly, property.onlyRead (injected from DI)
+    #[Inject]
+    private readonly Login $login; //@phpstan-ignore property.uninitializedReadonly, property.onlyRead (injected from DI)
 
     /**
      * Get the preferences the plugin declares
@@ -49,11 +51,9 @@ class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, M
      */
     public function getMenus(): array
     {
-        /** @var Login $login */
-        global $login;
         $menus = [];
 
-        if ($login->isAdmin()) {
+        if ($this->login->isAdmin()) {
             $menus['configuration'] = [
                 'items' => [
                     [
@@ -66,7 +66,7 @@ class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, M
             ];
         }
 
-        if ($login->isLogged() && !$login->isSuperAdmin()) {
+        if ($this->login->isLogged() && !$this->login->isSuperAdmin()) {
             $menus['myaccount'] = [
                 'items' => [
                     [
@@ -107,10 +107,7 @@ class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, M
      */
     public function getMyDashboards(): array
     {
-        /** @var Login $login */
-        global $login;
-
-        if ($login->isSuperAdmin()) {
+        if ($this->login->isSuperAdmin()) {
             return [];
         }
 
@@ -119,7 +116,7 @@ class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, M
                 'label' => _T("My localization", "maps"),
                 'route' => [
                     'name' => 'maps_localize_member',
-                    'args' => ["id" => $login->id]
+                    'args' => ["id" => $this->login->id]
                 ],
                 'icon' => 'map'
             ]
