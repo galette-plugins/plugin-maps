@@ -410,13 +410,10 @@ def add_libs(rel_name, galette_archive):
     # development only, nothing a Galette installation needs — the npm sources
     # included, the build output is what ships
     todrop = [
-        '.composer-require-checker.config.json',
         '.docheader',
         '.gitignore',
         '.php-cs-fixer.dist.php',
         '.phpcs.xml',
-        '.scrutinizer.yml',
-        'composer.json.checker',
         'gulpfile.js',
         'package.json',
         'package-lock.json',

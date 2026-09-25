@@ -60,7 +60,6 @@ class MapsController extends AbstractPluginController
         $list = $coords->listCoords();
 
         $params = [
-            'require_dialog'    => true,
             'page_title'        => _T('Maps', 'maps'),
             'module_id'         => $this->getModuleId(),
             'tiles'             => TileProviders::resolve($this->preferences)
@@ -136,7 +135,6 @@ class MapsController extends AbstractPluginController
             ),
             'member'            => $member,
             'can_edit'          => $can_edit,
-            'require_dialog'    => true,
             'adh_map'           => true,
             'module_id'         => $this->getModuleId(),
             'tiles'             => TileProviders::resolve($this->preferences)
