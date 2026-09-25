@@ -56,19 +56,18 @@ class MapsController extends AbstractPluginController
      */
     public function map(Request $request, Response $response): Response
     {
-        $coords = new Coordinates();
-        $list = $coords->listCoords();
-
         $params = [
             'page_title'        => _T('Maps', 'maps'),
             'module_id'         => $this->getModuleId(),
-            'tiles'             => TileProviders::resolve($this->preferences)
+            'tiles'             => TileProviders::resolve($this->preferences),
+            'list'              => []
         ];
 
-        if ($list !== false) {
-            $params['list'] = $list;
-        } else {
-            $this->flash->addMessage(
+        try {
+            $params['list'] = (new Coordinates())->listCoords();
+        } catch (\Throwable $e) {
+            //already logged
+            $this->flash->addMessageNow(
                 'error_detected',
                 _T('Coordinates has not been loaded. Maybe plugin tables does not exists in the database?', 'maps')
             );
