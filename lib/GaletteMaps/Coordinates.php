@@ -15,8 +15,6 @@ use ArrayObject;
 use Galette\Core\Db;
 use Galette\Entity\Adherent;
 use Laminas\Db\Sql\Expression;
-use Laminas\Db\Sql\Predicate\PredicateSet;
-use Laminas\Db\Sql\Predicate\Operator;
 
 /**
  * Members GPS coordinates
@@ -87,60 +85,28 @@ class Coordinates
                 'a.' . self::PK . '=' . 'c.' . self::PK,
                 //only what the map displays
                 ['nom_adh', 'prenom_adh', 'pseudo_adh', 'societe_adh']
-            )->where->equalTo(
-                'activite_adh',
-                new Expression('true')
             );
+            $where = $select->where;
+            $where->equalTo('a.activite_adh', new Expression('true'));
 
             if (
                 !$login->isAdmin()
                 && !$login->isStaff()
                 && !$login->isSuperAdmin()
             ) {
-                //limit query to public up-to-date profiles
-                $select->where(
-                    [
-                        new PredicateSet(
-                            [
-                                new Operator(
-                                    'date_echeance',
-                                    '>=',
-                                    date('Y-m-d')
-                                ),
-                                new Operator(
-                                    'bool_exempt_adh',
-                                    '=',
-                                    new Expression('true')
-                                )
-                            ],
-                            PredicateSet::OP_OR
-                        ),
-                        new PredicateSet(
-                            [
-                                new Operator(
-                                    'bool_display_info',
-                                    '=',
-                                    new Expression('true')
-                                )
-                            ]
-                        )
-                    ]
-                );
-
-                if ($login->isLogged() && !$login->isSuperAdmin()) {
-                    $select->where(
-                        new PredicateSet(
-                            [
-                                new Operator(
-                                    'a.' . Adherent::PK,
-                                    '=',
-                                    $login->id
-                                )
-                            ]
-                        ),
-                        PredicateSet::OP_OR
-                    );
+                //limit query to public up-to-date profiles, and to logged-in member own one
+                $visible = $where->nest();
+                $public = $visible->nest();
+                $public->nest()
+                    ->greaterThanOrEqualTo('a.date_echeance', date('Y-m-d'))
+                    ->or->equalTo('a.bool_exempt_adh', new Expression('true'))
+                    ->unnest();
+                $public->and->equalTo('a.bool_display_info', new Expression('true'));
+                $public->unnest();
+                if ($login->isLogged()) {
+                    $visible->or->equalTo('a.' . Adherent::PK, $login->id);
                 }
+                $visible->unnest();
             }
 
             $results = $zdb->execute($select);
@@ -243,7 +209,7 @@ class Coordinates
             return ($del->count() > 0);
         } catch (\Exception $e) {
             Analog::log(
-                'Unable to set coordinates for member '
+                'Unable to remove coordinates for member '
                 . $id . ' | ' . $e->getMessage(),
                 Analog::ERROR
             );
