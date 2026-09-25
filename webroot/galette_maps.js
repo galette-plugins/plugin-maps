@@ -280,9 +280,16 @@
             marker.bindPopup(content);
             group.addLayer(marker);
         });
+        //snapped positions must not look like street addresses
+        if (config.max_zoom) {
+            map.setMaxZoom(Math.min(map.getMaxZoom(), config.max_zoom));
+        }
         map.addLayer(group);
         if (config.markers.length > 0) {
-            map.fitBounds(group.getBounds(), {padding: [50, 50], maxZoom: 12});
+            map.fitBounds(group.getBounds(), {
+                padding: [50, 50],
+                maxZoom: config.max_zoom ? Math.min(12, config.max_zoom) : 12
+            });
         }
     }
 

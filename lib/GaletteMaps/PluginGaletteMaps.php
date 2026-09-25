@@ -41,7 +41,7 @@ class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, M
      */
     public function getPreferences(): array
     {
-        return TileProviders::getSchema();
+        return TileProviders::getSchema() + Precision::getSchema();
     }
 
     /**

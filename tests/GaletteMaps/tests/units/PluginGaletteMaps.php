@@ -120,4 +120,18 @@ class PluginGaletteMaps extends GaletteTestCase
     {
         $this->assertTrue($this->getPlugin()->isInstalled());
     }
+
+    /**
+     * Plugin declares background map and precision preferences
+     */
+    public function testPreferences(): void
+    {
+        $this->assertSame(
+            array_merge(
+                array_keys(\GaletteMaps\TileProviders::getSchema()),
+                [\GaletteMaps\Precision::PREF]
+            ),
+            array_keys($this->getPlugin()->getPreferences())
+        );
+    }
 }

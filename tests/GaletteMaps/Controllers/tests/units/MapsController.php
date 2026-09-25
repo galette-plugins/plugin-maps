@@ -14,6 +14,7 @@ use Analog\Analog;
 use Galette\Entity\Adherent;
 use Galette\Tests\GaletteRoutingTestCase;
 use GaletteMaps\Coordinates;
+use GaletteMaps\Precision;
 use GaletteMaps\TileProviders;
 
 /**
@@ -391,6 +392,48 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Snapped positions cap the map zoom; exact ones do not
+     */
+    public function testMapPrecision(): void
+    {
+        $member_one = $this->getMemberOne();
+        $update = $this->zdb->update(Adherent::TABLE);
+        $update->set([
+            'bool_display_info' => new \Laminas\Db\Sql\Expression('true'),
+            'bool_exempt_adh' => new \Laminas\Db\Sql\Expression('true'),
+        ])->where([Adherent::PK => $member_one->id]);
+        $this->zdb->execute($update);
+        (new Coordinates($this->zdb, $this->login))->set($member_one->id, 50.362038, 3.472998);
+        $this->preferences->pref_publicpages_visibility_generic = \Galette\Core\Preferences::PUBLIC_PAGES_VISIBILITY_PUBLIC;
+        $request = $this->createRequest('maps_map');
+
+        //visitor, default precision
+        $config = $this->getMapsConfig((string)$this->app->handle($request)->getBody());
+        $this->assertSame(['50.36', '3.47'], [$config['markers'][0]['lat'], $config['markers'][0]['lng']]);
+        $this->assertSame(Precision::getMaxZoom(Precision::DEFAULT), $config['max_zoom']);
+
+        try {
+            $this->assertTrue($this->preferences->setValue(Precision::PREF, '100km', $this->login));
+            $config = $this->getMapsConfig((string)$this->app->handle($request)->getBody());
+            $this->assertSame(['50', '4'], [$config['markers'][0]['lat'], $config['markers'][0]['lng']]);
+            $this->assertSame(Precision::getMaxZoom('100km'), $config['max_zoom']);
+
+            $this->assertTrue($this->preferences->setValue(Precision::PREF, Precision::EXACT, $this->login));
+            $config = $this->getMapsConfig((string)$this->app->handle($request)->getBody());
+            $this->assertSame('50.362038', $config['markers'][0]['lat']);
+            $this->assertNull($config['max_zoom']);
+        } finally {
+            $this->assertTrue($this->preferences->setValue(Precision::PREF, Precision::DEFAULT, $this->login));
+        }
+
+        //member itself: exact, no cap
+        $this->logMember($this->dataAdherentOne());
+        $config = $this->getMapsConfig((string)$this->app->handle($request)->getBody());
+        $this->assertSame('50.362038', $config['markers'][0]['lat']);
+        $this->assertNull($config['max_zoom']);
+    }
+
+    /**
      * Own localization page, with and without coordinates
      */
     public function testOwnPage(): void
@@ -461,10 +504,16 @@ class MapsController extends GaletteRoutingTestCase
         };
 
         try {
-            $store([TileProviders::PREF_PROVIDER => 'osm']);
+            $store([TileProviders::PREF_PROVIDER => 'osm', Precision::PREF => '50km']);
             $this->expectFlashData(['success_detected' => ['Maps settings have been saved.']]);
             $this->preferences->load();
             $this->assertSame('osm', TileProviders::resolve($this->preferences)['id']);
+            $this->assertSame('50km', Precision::resolve($this->preferences));
+
+            $store([TileProviders::PREF_PROVIDER => 'osm', Precision::PREF => '1km']);
+            $this->expectFlashData(['error_detected' => ['Unknown position precision.']]);
+            $this->preferences->load();
+            $this->assertSame('50km', Precision::resolve($this->preferences));
 
             //own values need an address
             $store([TileProviders::PREF_PROVIDER => TileProviders::CUSTOM, TileProviders::PREF_URL => '  ']);
@@ -499,7 +548,7 @@ class MapsController extends GaletteRoutingTestCase
             $this->preferences->load();
             $this->assertSame(17, TileProviders::resolve($this->preferences)['maxzoom']);
         } finally {
-            foreach (TileProviders::getSchema() as $name => $schema) {
+            foreach (TileProviders::getSchema() + Precision::getSchema() as $name => $schema) {
                 $this->preferences->setValue($name, $schema['default'], $this->login);
             }
         }

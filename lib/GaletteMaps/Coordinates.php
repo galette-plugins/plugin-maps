@@ -68,10 +68,13 @@ class Coordinates
      *
      * Staff and administrators see every active member; others see active,
      * up-to-date members who display their information, and their own position.
+     * Positions are snapped to the grid for them, except their own one.
      *
-     * @return array<int, array{id_adh: int, lat: string, lng: string, name: string, nickname: ?string, company?: string}>
+     * @param ?float $step Grid step positions are snapped to, in degrees; null for exact positions
+     *
+     * @return array<int, array{id_adh: int, lat: string, lng: string, approximate: bool, name: string, nickname: ?string, company?: string}>
      */
-    public function listVisible(): array
+    public function listVisible(?float $step = null): array
     {
         $select = $this->zdb->select($this->getTableName(), 'c');
         $select->join(
@@ -85,11 +88,11 @@ class Coordinates
         $where = $select->where;
         $where->equalTo('a.activite_adh', right: true);
 
-        if (
-            !$this->login->isAdmin()
-            && !$this->login->isStaff()
-            && !$this->login->isSuperAdmin()
-        ) {
+        $privileged = $this->login->isAdmin()
+            || $this->login->isStaff()
+            || $this->login->isSuperAdmin();
+
+        if (!$privileged) {
             //limit query to public up-to-date profiles, and to logged-in member own one
             $visible = $where->nest();
             $public = $visible->nest();
@@ -107,10 +110,13 @@ class Coordinates
 
         $res = [];
         foreach ($this->zdb->execute($select) as $r) {
+            $id_adh = (int)$r[self::PK];
+            $approximate = $step !== null && !$privileged && $id_adh !== (int)$this->login->id;
             $m = [
-                'id_adh'    => (int)$r[self::PK],
-                'lat'       => (string)$r['latitude'],
-                'lng'       => (string)$r['longitude'],
+                'id_adh'    => $id_adh,
+                'lat'       => $approximate ? Precision::snap($r['latitude'], $step) : (string)$r['latitude'],
+                'lng'       => $approximate ? Precision::snap($r['longitude'], $step) : (string)$r['longitude'],
+                'approximate' => $approximate,
                 'name'      => Adherent::getNameWithCase($r['nom_adh'], $r['prenom_adh']),
                 'nickname'  => $r['pseudo_adh']
             ];

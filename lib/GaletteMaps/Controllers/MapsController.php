@@ -14,6 +14,7 @@ use DI\Attribute\Inject;
 use Galette\Controllers\AbstractPluginController;
 use Galette\Entity\Adherent;
 use GaletteMaps\NominatimTowns;
+use GaletteMaps\Precision;
 use GaletteMaps\Coordinates;
 use GaletteMaps\TileProviders;
 use Slim\Psr7\Request;
@@ -80,11 +81,17 @@ class MapsController extends AbstractPluginController
             'page_title'        => _T('Maps', 'maps'),
             'module_id'         => $this->getModuleId(),
             'tiles'             => TileProviders::resolve($this->preferences),
-            'list'              => []
+            'list'              => [],
+            'max_zoom'          => null
         ];
 
+        $precision = Precision::resolve($this->preferences);
         try {
-            $params['list'] = $this->coordinates->listVisible();
+            $params['list'] = $this->coordinates->listVisible(Precision::getStep($precision));
+            //zooming further would suggest a precision snapped positions have not
+            if (in_array(true, array_column($params['list'], 'approximate'), true)) {
+                $params['max_zoom'] = Precision::getMaxZoom($precision);
+            }
         } catch (\Throwable $e) {
             Analog::log('Unable to list coordinates | ' . $e->getMessage(), Analog::ERROR);
             $this->flash->addMessageNow(
@@ -217,6 +224,8 @@ class MapsController extends AbstractPluginController
             'attribution'   => $this->preferences->getPluginValue(TileProviders::PREF_ATTRIBUTION),
             'maxzoom'       => $this->preferences->getPluginValue(TileProviders::PREF_MAXZOOM),
             'subdomains'    => $this->preferences->getPluginValue(TileProviders::PREF_SUBDOMAINS),
+            'precisions'    => Precision::getSelectValues(),
+            'precision'     => Precision::resolve($this->preferences),
         ];
 
         $this->view->render(
@@ -238,7 +247,21 @@ class MapsController extends AbstractPluginController
         $post = $request->getParsedBody();
         $provider = $post[TileProviders::PREF_PROVIDER] ?? TileProviders::DEFAULT;
 
-        $values = [TileProviders::PREF_PROVIDER => $provider];
+        $precision = (string)($post[Precision::PREF] ?? Precision::DEFAULT);
+        if (!Precision::isKnown($precision)) {
+            $this->flash->addMessage(
+                'error_detected',
+                _T('Unknown position precision.', 'maps')
+            );
+            return $response
+                ->withStatus(302)
+                ->withHeader('Location', $this->routeparser->urlFor('maps_preferences'));
+        }
+
+        $values = [
+            TileProviders::PREF_PROVIDER => $provider,
+            Precision::PREF => $precision,
+        ];
         if ($provider === TileProviders::CUSTOM) {
             //own values are only meaningful along with the custom provider
             $values += [

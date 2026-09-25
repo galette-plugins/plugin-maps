@@ -60,6 +60,7 @@ class Coordinates extends GaletteTestCase
                     'id_adh' => $member->id,
                     'lat' => '50.362038',
                     'lng' => '3.472998',
+                    'approximate' => false,
                     'name' => 'DURAND René',
                     'nickname' => 'ubertrand'
                 ]
@@ -167,5 +168,76 @@ class Coordinates extends GaletteTestCase
         $this->assertNull($coords->get(999999));
         //logged by Db
         $this->expectLogEntry(\Analog\Analog::ERROR, 'Query error: INSERT INTO');
+    }
+
+    /**
+     * Sort positions by member
+     *
+     * @param array<int, array{string, string, bool}> $positions Positions
+     *
+     * @return array<int, array{string, string, bool}>
+     */
+    private function sorted(array $positions): array
+    {
+        ksort($positions);
+        return $positions;
+    }
+
+    /**
+     * Get listed positions, by member
+     *
+     * @param ?float $step Grid step
+     *
+     * @return array<int, array{string, string, bool}>
+     */
+    private function listedPositions(?float $step): array
+    {
+        $positions = [];
+        foreach ((new \GaletteMaps\Coordinates($this->zdb, $this->login))->listVisible($step) as $row) {
+            $positions[$row['id_adh']] = [$row['lat'], $row['lng'], $row['approximate']];
+        }
+        //list has no order
+        ksort($positions);
+        return $positions;
+    }
+
+    /**
+     * Positions are snapped for everyone but staff, administrators and the member itself
+     */
+    public function testListPrecision(): void
+    {
+        $member_one = $this->getMemberOne();
+        $member_two = $this->getMemberTwo();
+        $coords = new \GaletteMaps\Coordinates($this->zdb, $this->login);
+        $coords->set($member_one->id, 50.362038, 3.472998);
+        $coords->set($member_two->id, 48.856614, 2.352222);
+        $this->setVisibility($member_one->id, active: true, public: true, uptodate: true);
+        $this->setVisibility($member_two->id, active: true, public: true, uptodate: true);
+
+        $exact_one = ['50.362038', '3.472998', false];
+        $exact_two = ['48.856614', '2.352222', false];
+        $snapped_one = ['50.36', '3.47', true];
+        $snapped_two = ['48.86', '2.35', true];
+
+        //visitor
+        $this->assertSame($this->sorted([$member_one->id => $snapped_one, $member_two->id => $snapped_two]), $this->listedPositions(0.01));
+        //exact positions required
+        $this->assertSame($this->sorted([$member_one->id => $exact_one, $member_two->id => $exact_two]), $this->listedPositions(null));
+
+        //member sees its own position as is
+        $this->assertTrue($this->login->login($this->dataAdherentOne()['login_adh'], $this->dataAdherentOne()['mdp_adh']));
+        $this->assertSame($this->sorted([$member_one->id => $exact_one, $member_two->id => $snapped_two]), $this->listedPositions(0.01));
+        $this->login->logout();
+
+        //staff members see exact positions
+        $this->getStaffMember($member_one);
+        $this->assertTrue($this->login->login($this->dataAdherentOne()['login_adh'], $this->dataAdherentOne()['mdp_adh']));
+        $this->assertTrue($this->login->isStaff());
+        $this->assertSame($this->sorted([$member_one->id => $exact_one, $member_two->id => $exact_two]), $this->listedPositions(0.01));
+        $this->login->logout();
+
+        $this->logSuperAdmin();
+        $this->assertSame($this->sorted([$member_one->id => $exact_one, $member_two->id => $exact_two]), $this->listedPositions(0.01));
+        $this->login->logout();
     }
 }

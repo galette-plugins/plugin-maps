@@ -10,6 +10,17 @@
     <form id="maps_settings" action="{{ url_for("maps_store_preferences") }}" method="post" class="ui form">
         <div class="ui segment">
             {% include "components/forms/select.html.twig" with {
+                id: 'pref_maps_public_precision',
+                value: precision,
+                values: precisions,
+                label: _T("Members positions precision", "maps"),
+                description: _T("How far from their stored position members may appear on the map. Staff, administrators and members themselves always see the exact position.", "maps")|e,
+                required: true
+            } %}
+        </div>
+
+        <div class="ui segment">
+            {% include "components/forms/select.html.twig" with {
                 id: 'pref_maps_tiles_provider',
                 value: provider,
                 values: providers,

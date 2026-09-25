@@ -16,7 +16,8 @@
 {% block javascripts %}
     {% include '@PluginGaletteMaps/common_scripts.html.twig' with {
         page_config: {
-            markers: list|map(l => {lat: l.lat, lng: l.lng, name: l.name, nickname: l.nickname, company: l.company ?? null})
+            markers: list|map(l => {lat: l.lat, lng: l.lng, name: l.name, nickname: l.nickname, company: l.company ?? null}),
+            max_zoom: max_zoom
         }
     } %}
 {% endblock %}
