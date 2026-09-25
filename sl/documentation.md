@@ -81,29 +81,33 @@ strežnikom ploščic.
 * **Poddomene** navaja črke, s katerimi je zamenjan žeton `{s}` naslova, na
   primer `abc`. Samo rastrske ploščice.
 
-## Positions precision
+## Natančnost pozicioniranja
 
-A member's stored position is often their home address. The map does not show it
-as is: positions are snapped to a grid, so a marker lands near the member, not
-on their door.
+Shranjena lokacija člana je pogosto njegov domači naslov. Zemljevid je ne
+prikazuje v dejanski obliki: lokacije so prilagojene mreži, zato se oznaka
+postavi v bližino člana in ne neposredno na njegov prag.
 
-The precision is a setting from `Maps settings`, in the `Configuration` menu:
+Natančnost je nastavitev v razdelku`Nastavitve zemljevidov ` v meniju
+`Konfiguracija `:
 
-* **About 100 km**, **About 50 km**, **About 5 km** — for a region, a
-  département or a town;
-* **About 500 m** — the default, a neighbourhood;
-* **About 50 m** — a street;
-* **Exact position** — no snapping, as the plugin behaved before.
+* **Približno 100 km**, **približno 50 km**, **približno 5 km** – za regijo,
+  departma ali mesto;
+* **Približno 500 m** — privzeta vrednost, soseska;
+* **Približno 50 m** — ulica;
+* **Natančen položaj** – brez pripenjanja, kot se je vtičnik obnašal prej.
 
-The value is how far, at most, a marker may be from the stored position.
+Vrednost predstavlja največjo možno oddaljenost označevalca od shranjenega
+položaja.
 
-Snapping applies to visitors and to members, group managers included. Staff
-members and administrators see exact positions, and every member sees their own
-position as they stored it. The page used to set a member's position is not
-concerned: it shows the exact position to the people allowed to open it.
+Funkcija »snapping« (poravnava na mrežo) velja tako za obiskovalce kot za člane,
+vključno z vodji skupin. Osebje in skrbniki vidijo natančne položaje, vsak član
+pa vidi svoj položaj tako, kot ga je shranil. To ne vpliva na stran za določanje
+položaja člana: ta prikazuje natančen položaj osebam, ki imajo dovoljenje za
+dostop do nje.
 
-When the map shows snapped positions, zooming stops at a level matching the
-precision, so that a marker does not seem to point at a precise address.
+Ko zemljevid prikazuje položaje, ki so bili poravnani z določenimi točkami (t.
+i. »snapping«), se povečava ustavi na stopnji, ki ustreza natančnosti, tako da
+oznaka ni videti, kot da kaže na točen naslov.
 
 ## Uporaba vtičnika
 
