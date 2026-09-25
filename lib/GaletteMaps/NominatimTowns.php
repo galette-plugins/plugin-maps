@@ -84,7 +84,7 @@ class NominatimTowns
                 ]
             );
             $places = json_decode((string)$response->getBody(), true, flags: JSON_THROW_ON_ERROR);
-        } catch (GuzzleException|\JsonException $e) {
+        } catch (GuzzleException | \JsonException $e) {
             throw new \RuntimeException(
                 'Error on nominatim request for "' . $town . '": ' . $e->getMessage(),
                 previous: $e
