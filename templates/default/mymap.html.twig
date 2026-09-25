@@ -10,8 +10,8 @@
 <section class="map-container">
     <div id="map"></div>
 {% if towns is defined and towns|length > 0 %}
-    <div id="possible_towns" class="ui tiny modal">
-        <div class="header">
+    <div id="possible_towns" class="ui tiny modal" role="dialog" aria-modal="true" aria-labelledby="possible_towns_title">
+        <div class="header" id="possible_towns_title">
         {% if mymap is defined %}
             {{ _T("Choose your location", "maps") }}
         {% else %}
