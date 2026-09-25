@@ -32,6 +32,7 @@ class MapsController extends GaletteRoutingTestCase
     {
         $this->login->logout();
         $this->preferences->pref_bool_groupsmanagers_edit_member = false;
+        $this->preferences->pref_bool_publicpages = true;
         $this->zdb->execute($this->zdb->delete(MAPS_PREFIX . Coordinates::TABLE));
         parent::tearDown();
     }
@@ -303,6 +304,81 @@ class MapsController extends GaletteRoutingTestCase
         $this->assertStringNotContainsString('\u003Cimg', $body);
         $this->assertStringContainsString('\u0026lt\u003Bb\u0026gt\u003Bnick', $body);
         $this->assertStringContainsString('\u0026lt\u003Bimg\u0020src', $body);
+    }
+
+    /**
+     * Map is displayed to visitors only when public pages allow it
+     */
+    public function testPublicMap(): void
+    {
+        $member_one = $this->getMemberOne();
+        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        $request = $this->createRequest('maps_map');
+
+        $this->preferences->pref_bool_publicpages = false;
+        $test_response = $this->app->handle($request);
+        $this->assertSame(
+            ['Location' => [$this->routeparser->urlFor('slash')]],
+            $test_response->getHeaders()
+        );
+        $this->assertSame(302, $test_response->getStatusCode());
+        $this->expectFlashData(['error_detected' => ['Unauthorized']]);
+
+        $this->preferences->pref_bool_publicpages = true;
+        $this->preferences->pref_publicpages_visibility_generic = \Galette\Core\Preferences::PUBLIC_PAGES_VISIBILITY_PUBLIC;
+        $test_response = $this->app->handle($request);
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('_mapsBinded', $body);
+        //member one does not display its information
+        $this->assertStringNotContainsString('48.850000', $body);
+    }
+
+    /**
+     * Own localization page, with and without coordinates
+     */
+    public function testOwnPage(): void
+    {
+        $member_one = $this->getMemberOne();
+        $this->logMember($this->dataAdherentOne());
+        $request = $this->createRequest('maps_mymap');
+
+        //no town search without a town
+        $update = $this->zdb->update(Adherent::TABLE);
+        $update->set(['ville_adh' => ''])->where([Adherent::PK => $member_one->id]);
+        $this->zdb->execute($update);
+        $test_response = $this->app->handle($request);
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringNotContainsString('id="possible_towns"', $body);
+        $this->assertStringNotContainsString('id="removecoords"', $body);
+        $this->assertStringContainsString('onMapClick', $body);
+
+        $this->assertTrue((new Coordinates())->setCoords($member_one->id, 48.85, 2.35));
+        $test_response = $this->app->handle($request);
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('var _lat = 48.850000;', $body);
+        $this->assertStringContainsString('id="removecoords"', $body);
+        $this->assertStringContainsString('I\\u0020live\\u0020here\\u0021', $body);
+    }
+
+    /**
+     * Only administrators reach preferences
+     */
+    public function testPreferencesAccess(): void
+    {
+        $this->getMemberOne();
+        $this->logMember($this->dataAdherentOne());
+        $this->expectAuthMiddlewareRefused($this->app->handle($this->createRequest('maps_preferences')));
+        $this->login->logout();
+
+        $this->logSuperAdmin();
+        $test_response = $this->app->handle($this->createRequest('maps_preferences'));
+        $this->assertSame(200, $test_response->getStatusCode());
+        $body = (string)$test_response->getBody();
+        $this->assertStringContainsString('id="pref_maps_tiles_provider"', $body);
+        $this->assertStringContainsString('OpenFreeMap, light grey', $body);
     }
 
     /**
