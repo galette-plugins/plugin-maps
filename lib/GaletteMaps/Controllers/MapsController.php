@@ -35,6 +35,20 @@ class MapsController extends AbstractPluginController
     protected array $module_info;
 
     /**
+     * Member dependencies to load; groups are loaded on demand by access checks
+     *
+     * @return array<string, bool>
+     */
+    private function getMemberDeps(): array
+    {
+        return [
+            'picture'   => false,
+            'groups'    => false,
+            'dues'      => false
+        ];
+    }
+
+    /**
      * Main route
      *
      * @param Request  $request  PSR Request
@@ -82,12 +96,7 @@ class MapsController extends AbstractPluginController
         if ($id === null) {
             $id = (int)$this->login->id;
         }
-        $deps = [
-            'picture'   => false,
-            'groups'    => false,
-            'dues'      => false
-        ];
-        $member = new Adherent($this->zdb, $id, $deps);
+        $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
 
         if (
             $this->login->id != $id
@@ -253,6 +262,7 @@ class MapsController extends AbstractPluginController
     {
         $error = null;
         $message = null;
+        $status = 200;
 
         if ($id === null && $this->login->isSuperAdmin()) {
             Analog::log(
@@ -260,33 +270,18 @@ class MapsController extends AbstractPluginController
                 Analog::INFO
             );
             $error = _T('Superadmin cannot be localized.', 'maps');
-        } elseif ($id === null) {
-            $member = new Adherent($this->zdb, $this->login->login);
-            $id = $member->id;
-        } elseif (
-            !$this->login->isSuperAdmin()
-            && !$this->login->isAdmin()
-            && !$this->login->isStaff()
-            && $this->login->isGroupManager()
-        ) {
-            $member = new Adherent($this->zdb, $id);
-            //check if current logged-in user can manage loaded member
-            $groups = $member->groups;
-            $can_manage = false;
-            foreach ($groups as $group) {
-                if ($this->login->isGroupManager($group->getId())) {
-                    $can_manage = true;
-                    break;
-                }
-            }
-            if ($can_manage !== true) {
+        } else {
+            $id ??= (int)$this->login->id;
+            $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
+            if (!$member->canEdit($this->login)) {
                 Analog::log(
                     'Logged in member ' . $this->login->login
-                    . ' has tried to load member #' . $id
-                    . ' but do not manage any groups he belongs to.',
+                    . ' has tried to change coordinates of member #' . $id
+                    . ' without the right to edit them.',
                     Analog::WARNING
                 );
-                $error = _T('Coordinates has not been removed :(', 'maps');
+                $error = _T('You do not have enough privileges.');
+                $status = 403;
             }
         }
 
@@ -320,7 +315,9 @@ class MapsController extends AbstractPluginController
             }
         }
 
-        $response = $response->withHeader('Content-type', 'application/json');
+        $response = $response
+            ->withStatus($status)
+            ->withHeader('Content-type', 'application/json');
 
         $res = [
             'res'       => $error === null,
