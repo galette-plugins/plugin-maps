@@ -49,6 +49,20 @@ class MapsController extends AbstractPluginController
     }
 
     /**
+     * Message for a member that does not exist
+     *
+     * @param int $id Requested member ID
+     */
+    private function getNoMemberMessage(int $id): string
+    {
+        return sprintf(
+            //TRANS: parameter is the member identifier
+            _T('No member #%1$s.'),
+            $id
+        );
+    }
+
+    /**
      * Main route
      *
      * @param Request  $request  PSR Request
@@ -91,10 +105,22 @@ class MapsController extends AbstractPluginController
      */
     public function localizeMember(Request $request, Response $response, ?int $id = null): Response
     {
-        if ($id === null) {
-            $id = (int)$this->login->id;
+        if ($id === null && $this->login->isSuperAdmin()) {
+            return $this->redirectWithErrors(
+                response: $response,
+                errors: [_T('Superadmin cannot be localized.', 'maps')],
+                redirect_url: $this->routeparser->urlFor('slash')
+            );
         }
+        $id ??= (int)$this->login->id;
         $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
+        if ($member->id === null) {
+            return $this->redirectWithErrors(
+                response: $response,
+                errors: [$this->getNoMemberMessage($id)],
+                redirect_url: $this->routeparser->urlFor('slash')
+            );
+        }
 
         if (!$member->canShow($this->login)) {
             Analog::log(
@@ -273,7 +299,10 @@ class MapsController extends AbstractPluginController
         } else {
             $id ??= (int)$this->login->id;
             $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
-            if (!$member->canEdit($this->login)) {
+            if ($member->id === null) {
+                $error = $this->getNoMemberMessage($id);
+                $status = 404;
+            } elseif (!$member->canEdit($this->login)) {
                 Analog::log(
                     'Logged in member ' . $this->login->login
                     . ' has tried to change coordinates of member #' . $id

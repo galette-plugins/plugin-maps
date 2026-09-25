@@ -306,6 +306,47 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Superadmin has no own localization page
+     */
+    public function testSuperAdminOwnPage(): void
+    {
+        $this->logSuperAdmin();
+        $test_response = $this->app->handle($this->createRequest('maps_mymap'));
+        $this->assertSame(
+            ['Location' => [$this->routeparser->urlFor('slash')]],
+            $test_response->getHeaders()
+        );
+        $this->assertSame(301, $test_response->getStatusCode());
+        $this->expectFlashData(['error_detected' => ['Superadmin cannot be localized.']]);
+    }
+
+    /**
+     * Localization of a member that does not exist
+     */
+    public function testMissingMember(): void
+    {
+        $this->logSuperAdmin();
+        $test_response = $this->app->handle($this->createRequest('maps_localize_member', ['id' => '999999']));
+        $this->assertSame(
+            ['Location' => [$this->routeparser->urlFor('slash')]],
+            $test_response->getHeaders()
+        );
+        $this->assertSame(301, $test_response->getStatusCode());
+        $this->expectFlashData(['error_detected' => ['No member #999999.']]);
+        //logged by Adherent on load
+        $this->expectLogEntry(Analog::ERROR, 'No member #999999');
+
+        $test_response = $this->postCoords(999999);
+        $this->assertSame(404, $test_response->getStatusCode());
+        $this->assertSame(
+            ['res' => false, 'message' => 'No member #999999.'],
+            json_decode((string)$test_response->getBody(), true)
+        );
+        $this->expectLogEntry(Analog::ERROR, 'No member #999999');
+        $this->expectNoLogEntry();
+    }
+
+    /**
      * Superadmin changes coordinates of any member, but has none
      */
     public function testSuperAdminCoords(): void
