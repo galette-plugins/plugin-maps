@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-02 16:34+0200\n"
+"POT-Creation-Date: 2026-09-25 04:16+0200\n"
 "PO-Revision-Date: 2025-12-08 05:17+0000\n"
 "Last-Translator: Максим Горпиніч <gorpinicmaksim0@gmail.com>\n"
 "Language-Team: Ukrainian <https://hosted.weblate.org/projects/galette/maps-"
@@ -116,7 +116,7 @@ msgid "Esri, light grey"
 msgstr ""
 
 #: ../lib/GaletteMaps/TileProviders.php:130
-#: ../tempcache/maps_preferences.html.twig:80
+#: ../templates/default/maps_preferences.html.twig:22
 msgid "Your own values"
 msgstr ""
 
@@ -135,143 +135,147 @@ msgstr "Геолокалізувати"
 msgid "Geolocalize %1$s"
 msgstr "Геолокалізувати %1$s"
 
-#: ../tempcache/maps.html.twig:115
+#: ../templates/default/maps.html.twig:28
 msgid "aka"
 msgstr "він же"
 
-#: ../tempcache/common_scripts.html.twig:166
+#: ../templates/default/common_scripts.html.twig:84
 msgid "An error occurred during 'I live here' process :("
 msgstr "Помилка під час процесу \"Я живу тут\" :("
 
-#: ../tempcache/common_scripts.html.twig:215
+#: ../templates/default/common_scripts.html.twig:104
 msgid "Display map in full screen"
 msgstr "Відкрити мапу на весь екран"
 
-#: ../tempcache/common_scripts.html.twig:219
+#: ../templates/default/common_scripts.html.twig:105
 msgid "Exit full screen"
 msgstr "Вийти з повноекранного режиму"
 
-#: ../tempcache/common_scripts.html.twig:231
+#: ../templates/default/common_scripts.html.twig:112
 msgid "Search your town..."
 msgstr "Пошук вашого міста..."
 
-#: ../tempcache/common_scripts.html.twig:237
+#: ../templates/default/common_scripts.html.twig:114
 msgid "Search a town..."
 msgstr "Пошук міста..."
 
-#: ../tempcache/common_scripts.html.twig:243
+#: ../templates/default/common_scripts.html.twig:116
 msgid "Sorry, that town could not be found."
 msgstr "На жаль, цього міста не вдалося знайти."
 
-#: ../tempcache/common_scripts.html.twig:247
+#: ../templates/default/common_scripts.html.twig:117
 msgid "Search"
 msgstr "Пошук"
 
-#: ../tempcache/common_scripts.html.twig:271
+#: ../templates/default/common_scripts.html.twig:132
 msgid "Show me where I am"
 msgstr "Показати де я"
 
-#: ../tempcache/common_scripts.html.twig:276
+#: ../templates/default/common_scripts.html.twig:134
 msgid "You seem located outside the boundaries of the map"
 msgstr "Здається, ви знаходитесь поза межами мапи"
 
-#: ../tempcache/maps_preferences.html.twig:68
+#: ../templates/default/maps_preferences.html.twig:15
 msgid "Background map provider"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:86
+#: ../templates/default/maps_preferences.html.twig:27
 msgid "Vector tiles"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:86
+#: ../templates/default/maps_preferences.html.twig:27
 msgid "Tick for a MapLibre style, leave unticked for classic raster tiles."
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:93
+#: ../templates/default/maps_preferences.html.twig:35
 msgid "Address"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:93
+#: ../templates/default/maps_preferences.html.twig:35
 msgid "Style address for vector tiles, tiles address for raster ones, such as:"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:99
+#: ../templates/default/maps_preferences.html.twig:42
 msgid "Attribution"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:99
+#: ../templates/default/maps_preferences.html.twig:42
 msgid ""
 "Credit the provider requires, HTML allowed. Data licences make it mandatory."
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:105
+#: ../templates/default/maps_preferences.html.twig:49
 msgid "Maximum zoom"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:111
+#: ../templates/default/maps_preferences.html.twig:57
 msgid "Subdomains"
 msgstr ""
 
-#: ../tempcache/maps_preferences.html.twig:111
+#: ../templates/default/maps_preferences.html.twig:57
 msgid ""
 "Letters the {s} token in the address is replaced with, such as abc. Raster "
 "tiles only."
 msgstr ""
 
-#: ../tempcache/mymap.html.twig:73
+#: ../templates/default/mymap.html.twig:16
 msgid "Choose your location"
 msgstr "Виберіть своє місцеперебування"
 
-#: ../tempcache/mymap.html.twig:79
+#: ../templates/default/mymap.html.twig:18
 #, php-format
 msgid "Choose %1$s location"
 msgstr "Оберіть розташування %1$s"
 
-#: ../tempcache/mymap.html.twig:89
+#: ../templates/default/mymap.html.twig:23
 msgid "Select your town."
 msgstr "Виберіть своє місто."
 
-#: ../tempcache/mymap.html.twig:93
+#: ../templates/default/mymap.html.twig:24
 #, php-format
 msgid "In the database, town is set to: '%1$s'"
 msgstr "У базі даних установлено місто: '%1$s'"
 
-#: ../tempcache/mymap.html.twig:188
+#: ../templates/default/mymap.html.twig:80
 #, php-format
 msgid "You clicked at %1$s"
 msgstr "Ви натиснули на %1$s"
 
-#: ../tempcache/mymap.html.twig:191 ../tempcache/mymap.html.twig:312
-#: ../tempcache/mymap.html.twig:341
+#: ../templates/default/mymap.html.twig:80
+#: ../templates/default/mymap.html.twig:153
+#: ../templates/default/mymap.html.twig:170
 msgid "I live here!"
 msgstr "Я живу тут!"
 
-#: ../tempcache/mymap.html.twig:193 ../tempcache/mymap.html.twig:314
-#: ../tempcache/mymap.html.twig:343
+#: ../templates/default/mymap.html.twig:80
+#: ../templates/default/mymap.html.twig:153
+#: ../templates/default/mymap.html.twig:170
 msgid "Member lives here!"
 msgstr "Член живе тут!"
 
-#: ../tempcache/mymap.html.twig:225
+#: ../templates/default/mymap.html.twig:98
 msgid "Remove my coordinates"
 msgstr "Видалити мої координати"
 
-#: ../tempcache/mymap.html.twig:227
+#: ../templates/default/mymap.html.twig:98
 msgid "Remove member coordinates"
 msgstr "Видалити координати члена"
 
-#: ../tempcache/mymap.html.twig:233
+#: ../templates/default/mymap.html.twig:100
 msgid "Are you sure you want to remove coordinates from the database?"
 msgstr "Ви впевнені, що хочете видалити координати з бази даних?"
 
-#: ../tempcache/mymap.html.twig:286
+#: ../templates/default/mymap.html.twig:136
 msgid "An error occurred removing coordinates :("
 msgstr "Під час видалення координат сталася помилка :("
 
-#: ../tempcache/common_html.html.twig:68 ../tempcache/common_html.html.twig:74
+#: ../templates/default/common_html.html.twig:19
+#: ../templates/default/common_html.html.twig:22
 msgid "Member (company)"
 msgstr "Член (компанія)"
 
-#: ../tempcache/common_html.html.twig:84 ../tempcache/common_html.html.twig:90
+#: ../templates/default/common_html.html.twig:27
+#: ../templates/default/common_html.html.twig:30
 msgid "Search result"
 msgstr "Підсумки пошуку"
 
