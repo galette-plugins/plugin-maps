@@ -85,29 +85,33 @@ répertorié, ou votre propre serveur de tuiles.
 * **Les sous-domaines** Lettres par lesquelles le jeton `{s}` dans l'adresse est
   remplacé, telles que abc. Tuiles classiques uniquement.
 
-## Positions precision
+## Précision de la position
 
-A member's stored position is often their home address. The map does not show it
-as is: positions are snapped to a grid, so a marker lands near the member, not
-on their door.
+La localisation d'un adhérent est souvent son adresse personnelle. La carte ne
+le montre pas comme tel : les positions sont attachées à une grille, donc un
+marqueur atterrit près de l'adhérent, pas au pas de sa porte.
 
-The precision is a setting from `Maps settings`, in the `Configuration` menu:
+La précision est un paramètre depuis `Configuration Maps`, dans le menu
+`Configuration` :
 
-* **About 100 km**, **About 50 km**, **About 5 km** — for a region, a
-  département or a town;
-* **About 500 m** — the default, a neighbourhood;
-* **About 50 m** — a street;
-* **Exact position** — no snapping, as the plugin behaved before.
+* **À environ 100 km**, **À environ 50 km**, **À environ 5 km** — pour une
+  région, un département ou une ville ;
+* **À environ 500 m** — par défaut, un quartier ;
+* **À environ 50 m** — une rue ;
+* **Position exacte** — pas d'adaptation, comme le faisait le plugin auparavant.
 
-The value is how far, at most, a marker may be from the stored position.
+La valeur est à quelle distance, au plus, un marqueur peut être de la position
+stockée.
 
-Snapping applies to visitors and to members, group managers included. Staff
-members and administrators see exact positions, and every member sees their own
-position as they stored it. The page used to set a member's position is not
-concerned: it shows the exact position to the people allowed to open it.
+L'adaptation s'applique aux visiteurs et aux adhérents, gestionnaires de groupe
+inclus. Les membres du bureau et les administrateurs voient les localisations
+exactes, et chaque adhérent voit sa propre position comme il l'a stockée. La
+page utilisée pour définir la position d'un membre n'est pas concernée : elle
+montre la position exacte des personnes autorisées à l'ouvrir.
 
-When the map shows snapped positions, zooming stops at a level matching the
-precision, so that a marker does not seem to point at a precise address.
+Lorsque la carte montre des positions adaptées, le zoom s'arrête à un niveau
+correspondant à la précision, de sorte qu'un marqueur ne semble pas pointer à
+une adresse précise.
 
 ## Utilisation du plugin
 
