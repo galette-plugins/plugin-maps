@@ -12,6 +12,9 @@ namespace GaletteMaps;
 
 use Analog\Analog;
 use Galette\Core\Preferences;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Towns GPS coordinates via nominatim
@@ -21,23 +24,22 @@ use Galette\Core\Preferences;
 
 class NominatimTowns
 {
-    private Preferences $preferences;
+    private const string URI = 'https://nominatim.openstreetmap.org/search';
 
-    /** @var array<string, string>  */
-    private array $query_options = [
-        'format'            => 'xml',
-        'addressdetails'    => '1'
-    ];
-    private string $uri = 'http://nominatim.openstreetmap.org/search';
+    private Preferences $preferences;
+    private ClientInterface $client;
 
     /**
      * Constructor
      *
-     * @param Preferences $preferences Preferences instance
+     * @param Preferences      $preferences Preferences instance
+     * @param ?ClientInterface $client      HTTP client, a default one is built if null
      */
-    public function __construct(Preferences $preferences)
+    public function __construct(Preferences $preferences, ?ClientInterface $client = null)
     {
         $this->preferences = $preferences;
+        //a slow answer must not hold the page
+        $this->client = $client ?? new Client(['timeout' => 5.0, 'connect_timeout' => 2.0]);
     }
 
     /**
@@ -47,96 +49,78 @@ class NominatimTowns
      * @param ?string $country Country name (optional)
      *
      * @return array<int, array<string, string>>
+     *
+     * @throws \RuntimeException when the service cannot be queried
      */
     public function search(string $town, ?string $country = null): array
     {
-        if (!$town || trim($town) === '') {
+        if (trim($town) === '') {
+            return [];
+        }
+
+        $query = [
+            'format'            => 'jsonv2',
+            'addressdetails'    => '1',
+            'city'              => $town
+        ];
+        if ($country !== null && trim($country) !== '') {
+            $query['country'] = $country;
+        }
+
+        try {
+            $response = $this->client->request(
+                'GET',
+                self::URI,
+                [
+                    'query' => $query,
+                    'headers' => [
+                        //usage policy requires to identify the application
+                        'User-Agent' => sprintf(
+                            'GaletteMaps (%s; %s)',
+                            $this->preferences->pref_nom,
+                            $this->preferences->getURL()
+                        )
+                    ]
+                ]
+            );
+            $places = json_decode((string)$response->getBody(), true, flags: JSON_THROW_ON_ERROR);
+        } catch (GuzzleException|\JsonException $e) {
             throw new \RuntimeException(
-                "Town has not been specified!"
+                'Error on nominatim request for "' . $town . '": ' . $e->getMessage(),
+                previous: $e
             );
         }
 
-        $options = $this->query_options;
-        $options['city'] = $town;
-        if ($country !== null) {
-            $options['country'] = $country;
+        if (!is_array($places)) {
+            throw new \RuntimeException('Unexpected nominatim answer for "' . $town . '"');
         }
-
-        $url_options = [];
-        foreach ($options as $key => $value) {
-            $url_options[] = $key . '=' . urlencode($value);
-        }
-
-        $url = $this->uri . '?' . implode('&', $url_options);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'GaletteMaps/' . $this->preferences->pref_nom);
-
-        $response = curl_exec($ch);
-        if ($response === false) {
-            throw new \RuntimeException(
-                "Error on nominatim request:\n\tURI:" . $url
-                . "\n\tOptions:\n" . print_r($options, true)
-            );
-        }
-
-        //get request infos
-        $infos = curl_getinfo($ch);
-        if ($infos['http_code'] !== 200) {
-            //At this point, core has been created, but is failing
-            //to load in solr.
-            throw new \RuntimeException(
-                "Error on nominatim:\n\tURI: " . $url
-                . "\n\Options: " . print_r($options, true)
-            );
-        }
-
-        $xml = new \SimpleXMLElement($response);
-        $towns = $xml->xpath('//place');
 
         $results = [];
-        foreach ($towns as $town) {
-            if ($town->city || $town->town || $town->village) {
-                $unique = true;
-                foreach ($results as $elt) {
-                    if (
-                        $elt['latitude'] == (string)$town['lat']
-                        && $elt['longitude'] == (string)$town['lon']
-                    ) {
-                        $unique = false;
-                        Analog::log(
-                            'Town is already in list, ignore.',
-                            Analog::INFO
-                        );
-                    }
-                }
-
-                if ($unique === true) {
-                    $full_name = null;
-                    if ($town->city) {
-                        $full_name = (string)$town->city;
-                    } elseif ($town->town) {
-                        $full_name = (string)$town->town;
-                    } elseif ($town->village) {
-                        $full_name = (string)$town->village;
-                    } else {
-                        $full_name = (string)$town['display_name'];
-                    }
-
-                    $results[] = [
-                        'full_name' => $full_name,
-                        'latitude'  => (string)$town['lat'],
-                        'longitude' => (string)$town['lon']
-                    ];
-                }
-            } else {
+        foreach ($places as $place) {
+            $address = $place['address'] ?? [];
+            $full_name = $address['city'] ?? $address['town'] ?? $address['village'] ?? null;
+            if ($full_name === null) {
                 Analog::log(
-                    'Nominatim result "' . $town['display_name']
-                    . '" is not a town',
+                    'Nominatim result "' . ($place['display_name'] ?? '') . '" is not a town',
                     Analog::INFO
                 );
+                continue;
             }
+
+            $latitude = (string)$place['lat'];
+            $longitude = (string)$place['lon'];
+            foreach ($results as $elt) {
+                if ($elt['latitude'] === $latitude && $elt['longitude'] === $longitude) {
+                    Analog::log('Town is already in list, ignore.', Analog::INFO);
+                    continue 2;
+                }
+            }
+
+            $results[] = [
+                'full_name' => (string)$full_name,
+                'latitude'  => $latitude,
+                'longitude' => $longitude
+            ];
         }
 
         return $results;

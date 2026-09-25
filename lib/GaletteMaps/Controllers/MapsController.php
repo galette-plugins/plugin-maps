@@ -116,12 +116,20 @@ class MapsController extends AbstractPluginController
 
         $towns = false;
         //towns are only proposed to choose a location
-        if ($can_edit && count($mcoords) === 0) {
-            if ($member->town != '') {
-                $t = new NominatimTowns($this->preferences);
-                $towns = $t->search(
+        if ($can_edit && count($mcoords) === 0 && trim($member->town ?? '') !== '') {
+            try {
+                $towns = (new NominatimTowns($this->preferences))->search(
                     $member->town,
                     $member->country
+                );
+            } catch (\RuntimeException $e) {
+                Analog::log(
+                    'Unable to search towns for member #' . $member->id . ' | ' . $e->getMessage(),
+                    Analog::WARNING
+                );
+                $this->flash->addMessageNow(
+                    'warning_detected',
+                    _T('Town search is not available for now, you can still search or click on the map.', 'maps')
                 );
             }
         }

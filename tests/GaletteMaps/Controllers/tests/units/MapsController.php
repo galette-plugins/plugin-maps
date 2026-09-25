@@ -201,6 +201,31 @@ class MapsController extends GaletteRoutingTestCase
     }
 
     /**
+     * Unreachable towns search does not prevent to display the map
+     */
+    public function testTownsSearchUnavailable(): void
+    {
+        $member_one = $this->getMemberOne();
+        $this->assertNotEmpty($member_one->town);
+        $this->logMember($this->dataAdherentOne());
+
+        //no proxy listens there: the request fails at once
+        putenv('HTTPS_PROXY=http://127.0.0.1:1');
+        try {
+            $test_response = $this->app->handle($this->createRequest('maps_mymap'));
+        } finally {
+            putenv('HTTPS_PROXY');
+        }
+        $this->assertSame(200, $test_response->getStatusCode());
+        $this->assertStringContainsString(
+            'Town search is not available for now, you can still search or click on the map.',
+            (string)$test_response->getBody()
+        );
+        $this->expectLogEntry(Analog::WARNING, 'Unable to search towns for member #' . $member_one->id);
+        $this->expectNoLogEntry();
+    }
+
+    /**
      * A member cannot display coordinates of another member
      */
     public function testMemberCannotShowOtherMemberCoords(): void
