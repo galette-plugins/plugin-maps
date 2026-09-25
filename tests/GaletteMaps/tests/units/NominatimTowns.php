@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace GaletteMaps\tests\units;
 
+use Analog\Analog;
 use Galette\Tests\GaletteTestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
@@ -61,8 +62,8 @@ class NominatimTowns extends GaletteTestCase
             ],
             $search->search('Valenciennes', 'France')
         );
-        $this->expectLogEntry(\Analog::INFO, 'Town is already in list, ignore.');
-        $this->expectLogEntry(\Analog::INFO, 'Nominatim result "Rue de Valenciennes" is not a town');
+        $this->expectLogEntry(Analog::INFO, 'Town is already in list, ignore.');
+        $this->expectLogEntry(Analog::INFO, 'Nominatim result "Rue de Valenciennes" is not a town');
 
         $this->assertCount(1, $this->requests);
         /** @var Request $request */
