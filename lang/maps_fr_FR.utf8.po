@@ -2,13 +2,14 @@
 #
 # , 2014.
 # Johan Cwiklinski <trasher@x-tnd.be>, 2020, 2022, 2025, 2026.
+# Damien <mouette03@yahoo.fr>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: translations@galette.eu\n"
 "POT-Creation-Date: 2026-09-27 18:15+0200\n"
-"PO-Revision-Date: 2026-09-02 14:45+0000\n"
-"Last-Translator: Johan Cwiklinski <trasher@x-tnd.be>\n"
+"PO-Revision-Date: 2026-09-28 04:01+0000\n"
+"Last-Translator: Damien <mouette03@yahoo.fr>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/galette/maps-"
 "plugin/fr/>\n"
 "Language: fr_FR\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 2026.9.dev0\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 #: ../_routes.php:22
 msgid "Javascript libraries has not been built!"
@@ -46,6 +47,8 @@ msgid ""
 "Town search is not available for now, you can still search or click on the "
 "map."
 msgstr ""
+"La recherche par ville n’est pas disponible pour le moment. Vous pouvez "
+"toujours effectuer une recherche ou cliquer sur la carte."
 
 #. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/Controllers/MapsController.php:178
@@ -60,7 +63,7 @@ msgstr "Préférences de Maps"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:254
 msgid "Unknown position precision."
-msgstr ""
+msgstr "Précision de position inconnue."
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:278
 msgid "An address is required to use your own background map."
@@ -142,27 +145,27 @@ msgstr "Géolocaliser %1$s"
 
 #: ../lib/GaletteMaps/Precision.php:131
 msgid "About 100 km"
-msgstr ""
+msgstr "Environ 100 km"
 
 #: ../lib/GaletteMaps/Precision.php:132
 msgid "About 50 km"
-msgstr ""
+msgstr "Environ 50 km"
 
 #: ../lib/GaletteMaps/Precision.php:133
 msgid "About 5 km"
-msgstr ""
+msgstr "Environ 5 km"
 
 #: ../lib/GaletteMaps/Precision.php:134
 msgid "About 500 m"
-msgstr ""
+msgstr "Environ 500 m"
 
 #: ../lib/GaletteMaps/Precision.php:135
 msgid "About 50 m"
-msgstr ""
+msgstr "Environ 50 m"
 
 #: ../lib/GaletteMaps/Precision.php:136
 msgid "Exact position"
-msgstr ""
+msgstr "Position exacte"
 
 #: ../templates/default/common_scripts.html.twig:26
 msgid "Display map in full screen"
@@ -235,13 +238,16 @@ msgstr "Une erreur est survenue à l'enregistrement des coordonnées :'("
 
 #: ../templates/default/maps_preferences.html.twig:15
 msgid "Members positions precision"
-msgstr ""
+msgstr "Précision de la position des membres"
 
 #: ../templates/default/maps_preferences.html.twig:15
 msgid ""
 "How far from their stored position members may appear on the map. Staff, "
 "administrators and members themselves always see the exact position."
 msgstr ""
+"À quelle distance de leur position enregistrée les membres peuvent "
+"apparaître sur la carte. Le personnel, les administrateurs et les membres "
+"eux-mêmes voient toujours la position exacte."
 
 #: ../templates/default/maps_preferences.html.twig:26
 msgid "Background map provider"
