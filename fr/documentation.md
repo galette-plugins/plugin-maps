@@ -68,9 +68,9 @@ Plusieurs fournisseurs sont proposés :
 > vous choisissez. La plupart d'entre eux sont gérés par des associations ou des
 > bénévoles, et ils établissent des conditions sur le trafic qu'ils acceptent.
 
-La dernière entrée de la liste, « Vos propres valeurs », remplace les
-fournisseurs proposés par votre propre adresse — un fournisseur qui n'est pas
-répertorié, ou votre propre serveur de tuiles.
+La dernière entrée de la liste, `Vos propres valeurs`, remplace les fournisseurs
+proposés par votre propre adresse — un fournisseur qui n'est pas répertorié, ou
+votre propre serveur de tuiles.
 
 ![Les champs de l'entrée Vos propres valeurs](images/tiles_custom.png)
 
