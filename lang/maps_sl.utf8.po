@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: translations@galette.eu\n"
 "POT-Creation-Date: 2026-09-27 18:15+0200\n"
-"PO-Revision-Date: 2026-09-23 14:07+0000\n"
+"PO-Revision-Date: 2026-09-28 08:56+0000\n"
 "Last-Translator: Jože Felicijan <joze@felicijan.com>\n"
 "Language-Team: Slovenian <https://hosted.weblate.org/projects/galette/maps-"
 "plugin/sl/>\n"
@@ -47,12 +47,14 @@ msgid ""
 "Town search is not available for now, you can still search or click on the "
 "map."
 msgstr ""
+"Iskanje mest trenutno ni na voljo; še vedno pa lahko iščete ali kliknete na "
+"zemljevid."
 
 #. TRANS: parameter is the member name
 #: ../lib/GaletteMaps/Controllers/MapsController.php:178
-#, fuzzy, php-format
+#, php-format
 msgid "%1$s geographic position"
-msgstr "% geografski položaj člana"
+msgstr "Geografski položaj %1$s"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:216
 #: ../lib/GaletteMaps/PluginGaletteMaps.php:60
@@ -61,7 +63,7 @@ msgstr "Nastavitve zemljevidov"
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:254
 msgid "Unknown position precision."
-msgstr ""
+msgstr "Natančnost položaja ni znana."
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:278
 msgid "An address is required to use your own background map."
@@ -80,10 +82,8 @@ msgid "Coordinates has not been removed :("
 msgstr "Koordinate niso bile odstranjene :("
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:371
-#, fuzzy
-#| msgid "Remove my coordinates"
 msgid "Invalid coordinates."
-msgstr "Odstrani moje koordinate"
+msgstr "Neveljavne koordinate."
 
 #: ../lib/GaletteMaps/Controllers/MapsController.php:376
 msgid "New coordinates has been stored!"
@@ -143,27 +143,27 @@ msgstr "Geolokaliziraj %1$s"
 
 #: ../lib/GaletteMaps/Precision.php:131
 msgid "About 100 km"
-msgstr ""
+msgstr "Približno 100 km"
 
 #: ../lib/GaletteMaps/Precision.php:132
 msgid "About 50 km"
-msgstr ""
+msgstr "Približno 50 km"
 
 #: ../lib/GaletteMaps/Precision.php:133
 msgid "About 5 km"
-msgstr ""
+msgstr "Približno 5 km"
 
 #: ../lib/GaletteMaps/Precision.php:134
 msgid "About 500 m"
-msgstr ""
+msgstr "Približno 500 m"
 
 #: ../lib/GaletteMaps/Precision.php:135
 msgid "About 50 m"
-msgstr ""
+msgstr "Približno 50 m"
 
 #: ../lib/GaletteMaps/Precision.php:136
 msgid "Exact position"
-msgstr ""
+msgstr "Natančen položaj"
 
 #: ../templates/default/common_scripts.html.twig:26
 msgid "Display map in full screen"
@@ -236,13 +236,15 @@ msgstr "Pri odstranjevanju koordinat je prišlo do napake :("
 
 #: ../templates/default/maps_preferences.html.twig:15
 msgid "Members positions precision"
-msgstr ""
+msgstr "Natančnost položajev elementov"
 
 #: ../templates/default/maps_preferences.html.twig:15
 msgid ""
 "How far from their stored position members may appear on the map. Staff, "
 "administrators and members themselves always see the exact position."
 msgstr ""
+"Kako daleč od svoje shranjene lokacije se lahko člani prikažejo na "
+"zemljevidu. Osebje, skrbniki in člani sami vedno vidijo točno lokacijo."
 
 #: ../templates/default/maps_preferences.html.twig:26
 msgid "Background map provider"
