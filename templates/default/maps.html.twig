@@ -1,23 +1,9 @@
 {#
-/**
- * Copyright © 2003-2024 The Galette Team
- *
- * This file is part of Galette (https://galette.eu).
- *
- * Galette is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Galette is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Galette. If not, see <http://www.gnu.org/licenses/>.
- */
-#}
+ # This file is part of Galette Maps plugin (https://galette.eu).
+ # SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ # SPDX-License-Identifier: GPL-3.0-or-later
+ #}
+
 {% extends not login.isLogged() ? "public_page.html.twig" : "page.html.twig" %}
 
 {% block content %}
@@ -28,35 +14,10 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% include '@PluginGaletteMaps/common_scripts.html.twig' %}
-<script type="text/javascript">
-    var _mapsBinded = function(map)
-    {
-        var _markers = [];
-{% for l in list %}
-    {% if l.company is defined and l.company != '' %}
-        {% set icon = 'galetteProIcon' %}
-    {% else %}
-        {% set icon = 'galetteIcon' %}
-    {% endif %}
-        _member = [{{ l.lat }}, {{ l.lng }}, {{ icon }}, '<p><strong>{{ l.name|e("js") }}</strong>{% if l.nickname != '' %} {{ _T("aka", "maps")|e("js") }} <em>{{ l.nickname|e("js") }}</em>{% endif %}{% if l.company is defined %}<br/>{{ l.company|e("js") }}{% endif %}</p>'];
-        _markers.push(_member);
-{% endfor %}
-        var _group = L.markerClusterGroup();
-        for (var i = 0; i < _markers.length; i++) {
-            var _a = _markers[i];
-            var _title = _a[3];
-            var _icon = _a[2];
-            var _marker = L.marker(new L.LatLng(_a[0], _a[1]), { icon: _icon });
-            _marker.bindPopup(_title);
-            _group.addLayer(_marker);
+    {% include '@PluginGaletteMaps/common_scripts.html.twig' with {
+        page_config: {
+            markers: list|map(l => {lat: l.lat, lng: l.lng, name: l.name, nickname: l.nickname, company: l.company ?? null}),
+            max_zoom: max_zoom
         }
-        map.addLayer(_group).fitBounds(
-            _group.getBounds(), {
-                padding: [50, 50],
-                maxZoom: 12
-            }
-        );
-    }
-</script>
+    } %}
 {% endblock %}

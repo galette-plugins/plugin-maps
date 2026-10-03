@@ -1,22 +1,9 @@
 <?php
 
 /**
- * Copyright © 2003-2025 The Galette Team
- *
- * This file is part of Galette (https://galette.eu).
- *
- * Galette is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Galette is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Galette. If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Galette Maps plugin (https://galette.eu).
+ * SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 declare(strict_types=1);
@@ -27,7 +14,9 @@ use DI\Attribute\Inject;
 use Galette\Controllers\AbstractPluginController;
 use Galette\Entity\Adherent;
 use GaletteMaps\NominatimTowns;
+use GaletteMaps\Precision;
 use GaletteMaps\Coordinates;
+use GaletteMaps\TileProviders;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Analog\Analog;
@@ -46,29 +35,66 @@ class MapsController extends AbstractPluginController
     #[Inject("Plugin Galette Maps")]
     protected array $module_info;
 
+    #[Inject]
+    protected Coordinates $coordinates;
+
+    #[Inject]
+    protected NominatimTowns $nominatim;
+
+    /**
+     * Member dependencies to load; groups are loaded on demand by access checks
+     *
+     * @return array<string, bool>
+     */
+    private function getMemberDeps(): array
+    {
+        return [
+            'picture'   => false,
+            'groups'    => false,
+            'dues'      => false
+        ];
+    }
+
+    /**
+     * Message for a member that does not exist
+     *
+     * @param int $id Requested member ID
+     */
+    private function getNoMemberMessage(int $id): string
+    {
+        return sprintf(
+            //TRANS: parameter is the member identifier
+            _T('No member #%1$s.'),
+            $id
+        );
+    }
+
     /**
      * Main route
      *
      * @param Request  $request  PSR Request
      * @param Response $response PSR Response
-     *
-     * @return Response
      */
     public function map(Request $request, Response $response): Response
     {
-        $coords = new Coordinates();
-        $list = $coords->listCoords();
-
         $params = [
-            'require_dialog'    => true,
             'page_title'        => _T('Maps', 'maps'),
-            'module_id'         => $this->getModuleId()
+            'module_id'         => $this->getModuleId(),
+            'tiles'             => TileProviders::resolve($this->preferences),
+            'list'              => [],
+            'max_zoom'          => null
         ];
 
-        if ($list !== false) {
-            $params['list'] = $list;
-        } else {
-            $this->flash->addMessage(
+        $precision = Precision::resolve($this->preferences);
+        try {
+            $params['list'] = $this->coordinates->listVisible(Precision::getStep($precision));
+            //zooming further would suggest a precision snapped positions have not
+            if (in_array(true, array_column($params['list'], 'approximate'), true)) {
+                $params['max_zoom'] = Precision::getMaxZoom($precision);
+            }
+        } catch (\Throwable $e) {
+            Analog::log('Unable to list coordinates | ' . $e->getMessage(), Analog::ERROR);
+            $this->flash->addMessageNow(
                 'error_detected',
                 _T('Coordinates has not been loaded. Maybe plugin tables does not exists in the database?', 'maps')
             );
@@ -89,73 +115,79 @@ class MapsController extends AbstractPluginController
      * @param Request  $request  PSR Request
      * @param Response $response PSR Response
      * @param ?int     $id       Member ID
-     *
-     * @return Response
      */
     public function localizeMember(Request $request, Response $response, ?int $id = null): Response
     {
-        if ($id === null) {
-            $id = (int)$this->login->id;
+        if ($id === null && $this->login->isSuperAdmin()) {
+            return $this->redirectWithErrors(
+                response: $response,
+                errors: [_T('Superadmin cannot be localized.', 'maps')],
+                redirect_url: $this->routeparser->urlFor('slash')
+            );
         }
-        $deps = [
-            'picture'   => false,
-            'groups'    => false,
-            'dues'      => false
-        ];
-        $member = new Adherent($this->zdb, $id, $deps);
-
-        if (
-            $this->login->id != $id
-            && !$this->login->isAdmin()
-            && !$this->login->isStaff()
-            && $this->login->isGroupManager()
-        ) {
-            //check if requested member is part of managed groups
-            $groups = $member->groups;
-            $is_managed = false;
-            foreach ($groups as $g) {
-                if ($this->login->isGroupManager($g->getId())) {
-                    $is_managed = true;
-                    break;
-                }
-            }
-            if ($is_managed !== true) {
-                //requested member is not part of managed groups, fall back to logged
-                //in member
-                //FIXME: silent fallback is maybe not the best to do
-                $member->load($this->login->id);
-            }
+        $id ??= (int)$this->login->id;
+        $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
+        if ($member->id === null) {
+            return $this->redirectWithErrors(
+                response: $response,
+                errors: [$this->getNoMemberMessage($id)],
+                redirect_url: $this->routeparser->urlFor('slash')
+            );
         }
 
-        $coords = new Coordinates();
-        $mcoords = $coords->getCoords($member->id);
+        if (!$member->canShow($this->login)) {
+            Analog::log(
+                'Logged in member ' . $this->login->login
+                . ' has tried to display coordinates of member #' . $id
+                . ' without the right to show them.',
+                Analog::WARNING
+            );
+            return $this->redirectWithErrors(
+                response: $response,
+                errors: [_T("You do not have permission for requested URL.")],
+                redirect_url: $this->routeparser->urlFor('me')
+            );
+        }
+        $can_edit = $member->canEdit($this->login);
+
+        $mcoords = $this->coordinates->get($member->id);
 
         $towns = false;
-        if (count($mcoords) === 0) {
-            if ($member->town != '') {
-                $t = new NominatimTowns($this->preferences);
-                $towns = $t->search(
+        //towns are only proposed to choose a location
+        if ($can_edit && $mcoords === null && trim($member->town ?? '') !== '') {
+            try {
+                $towns = $this->nominatim->search(
                     $member->town,
                     $member->country
+                );
+            } catch (\RuntimeException $e) {
+                Analog::log(
+                    'Unable to search towns for member #' . $member->id . ' | ' . $e->getMessage(),
+                    Analog::WARNING
+                );
+                $this->flash->addMessageNow(
+                    'warning_detected',
+                    _T('Town search is not available for now, you can still search or click on the map.', 'maps')
                 );
             }
         }
 
         $params = [
-            'page_title'        => _T('Maps', 'maps') . ' - ' . str_replace(
-                '%member',
-                $member->sfullname,
-                _T('%member geographic position', 'maps')
+            'page_title'        => _T('Maps', 'maps') . ' - ' . sprintf(
+                //TRANS: parameter is the member name
+                _T('%1$s geographic position', 'maps'),
+                $member->sfullname
             ),
             'member'            => $member,
-            'require_dialog'    => true,
+            'can_edit'          => $can_edit,
             'adh_map'           => true,
-            'module_id'         => $this->getModuleId()
+            'module_id'         => $this->getModuleId(),
+            'tiles'             => TileProviders::resolve($this->preferences)
         ];
 
         if ($towns !== false) {
             $params['towns'] = $towns;
-        } elseif (count($mcoords) > 0) {
+        } elseif ($mcoords !== null) {
             $params['town'] = $mcoords;
         }
 
@@ -173,18 +205,120 @@ class MapsController extends AbstractPluginController
     }
 
     /**
+     * Tile provider settings
+     *
+     * @param Request  $request  PSR Request
+     * @param Response $response PSR Response
+     */
+    public function preferences(Request $request, Response $response): Response
+    {
+        $params = [
+            'page_title'    => _T('Maps settings', 'maps'),
+            'module_id'     => $this->getModuleId(),
+            'providers'     => TileProviders::getSelectValues(),
+            'custom'        => TileProviders::CUSTOM,
+            'tiles'         => TileProviders::resolve($this->preferences),
+            'provider'      => $this->preferences->getPluginValue(TileProviders::PREF_PROVIDER),
+            'vector'        => $this->preferences->getPluginValue(TileProviders::PREF_VECTOR),
+            'url'           => $this->preferences->getPluginValue(TileProviders::PREF_URL),
+            'attribution'   => $this->preferences->getPluginValue(TileProviders::PREF_ATTRIBUTION),
+            'maxzoom'       => $this->preferences->getPluginValue(TileProviders::PREF_MAXZOOM),
+            'subdomains'    => $this->preferences->getPluginValue(TileProviders::PREF_SUBDOMAINS),
+            'precisions'    => Precision::getSelectValues(),
+            'precision'     => Precision::resolve($this->preferences),
+        ];
+
+        $this->view->render(
+            $response,
+            $this->getTemplate('maps_preferences'),
+            $params
+        );
+        return $response;
+    }
+
+    /**
+     * Store tile provider settings
+     *
+     * @param Request  $request  PSR Request
+     * @param Response $response PSR Response
+     */
+    public function storePreferences(Request $request, Response $response): Response
+    {
+        $post = $request->getParsedBody();
+        $provider = $post[TileProviders::PREF_PROVIDER] ?? TileProviders::DEFAULT;
+
+        $precision = (string)($post[Precision::PREF] ?? Precision::DEFAULT);
+        if (!Precision::isKnown($precision)) {
+            $this->flash->addMessage(
+                'error_detected',
+                _T('Unknown position precision.', 'maps')
+            );
+            return $response
+                ->withStatus(302)
+                ->withHeader('Location', $this->routeparser->urlFor('maps_preferences'));
+        }
+
+        $values = [
+            TileProviders::PREF_PROVIDER => $provider,
+            Precision::PREF => $precision,
+        ];
+        if ($provider === TileProviders::CUSTOM) {
+            //own values are only meaningful along with the custom provider
+            $values += [
+                TileProviders::PREF_VECTOR => (int)isset($post[TileProviders::PREF_VECTOR]),
+                TileProviders::PREF_URL => trim((string)($post[TileProviders::PREF_URL] ?? '')),
+                TileProviders::PREF_ATTRIBUTION => trim((string)($post[TileProviders::PREF_ATTRIBUTION] ?? '')),
+                TileProviders::PREF_MAXZOOM => (int)($post[TileProviders::PREF_MAXZOOM] ?? 19),
+                TileProviders::PREF_SUBDOMAINS => trim((string)($post[TileProviders::PREF_SUBDOMAINS] ?? '')),
+            ];
+
+            if ($values[TileProviders::PREF_URL] === '') {
+                $this->flash->addMessage(
+                    'error_detected',
+                    _T('An address is required to use your own background map.', 'maps')
+                );
+                return $response
+                    ->withStatus(302)
+                    ->withHeader('Location', $this->routeparser->urlFor('maps_preferences'));
+            }
+        }
+
+        //each call resets errors of the previous one
+        $errors = [];
+        foreach ($values as $name => $value) {
+            if (!$this->preferences->setValue($name, $value, $this->login)) {
+                $errors = array_merge($errors, $this->preferences->getErrors());
+            }
+        }
+
+        if (count($errors) === 0) {
+            $this->flash->addMessage(
+                'success_detected',
+                _T('Maps settings have been saved.', 'maps')
+            );
+        } else {
+            foreach ($errors as $error) {
+                $this->flash->addMessage('error_detected', $error);
+            }
+        }
+
+        return $response
+            ->withStatus(302)
+            ->withHeader('Location', $this->routeparser->urlFor('maps_preferences'));
+    }
+
+    /**
      * Change member localization
      *
      * @param Request  $request  PSR Request
      * @param Response $response PSR Response
      * @param ?int     $id       Member ID
-     *
-     * @return Response
      */
     public function ILiveHere(Request $request, Response $response, ?int $id = null): Response
     {
         $error = null;
         $message = null;
+        $status = 200;
 
         if ($id === null && $this->login->isSuperAdmin()) {
             Analog::log(
@@ -192,76 +326,73 @@ class MapsController extends AbstractPluginController
                 Analog::INFO
             );
             $error = _T('Superadmin cannot be localized.', 'maps');
-        } elseif ($id === null) {
-            $member = new Adherent($this->zdb, $this->login->login);
-            $id = $member->id;
-        } elseif (
-            !$this->login->isSuperAdmin()
-            && !$this->login->isAdmin()
-            && !$this->login->isStaff()
-            && $this->login->isGroupManager()
-        ) {
-            $member = new Adherent($this->zdb, $id);
-            //check if current logged-in user can manage loaded member
-            $groups = $member->groups;
-            $can_manage = false;
-            foreach ($groups as $group) {
-                if ($this->login->isGroupManager($group->getId())) {
-                    $can_manage = true;
-                    break;
-                }
-            }
-            if ($can_manage !== true) {
+            $status = 400;
+        } else {
+            $id ??= (int)$this->login->id;
+            $member = new Adherent($this->zdb, $id, $this->getMemberDeps());
+            if ($member->id === null) {
+                $error = $this->getNoMemberMessage($id);
+                $status = 404;
+            } elseif (!$member->canEdit($this->login)) {
                 Analog::log(
                     'Logged in member ' . $this->login->login
-                    . ' has tried to load member #' . $id
-                    . ' but do not manage any groups he belongs to.',
+                    . ' has tried to change coordinates of member #' . $id
+                    . ' without the right to edit them.',
                     Analog::WARNING
                 );
-                $error = _T('Coordinates has not been removed :(', 'maps');
+                $error = _T('You do not have permission for requested URL.');
+                $status = 403;
             }
         }
 
         if ($error === null) {
             $post = $request->getParsedBody();
-            $coords = new Coordinates();
             if (isset($post['remove'])) {
-                $res = $coords->removeCoords($id);
-                if ($res > 0) {
+                try {
+                    $this->coordinates->remove($id);
                     $message = _T('Coordinates has been removed!', 'maps');
-                } else {
+                } catch (\Throwable $e) {
+                    Analog::log(
+                        'Unable to remove coordinates of member #' . $id . ' | ' . $e->getMessage(),
+                        Analog::ERROR
+                    );
                     $error = _T('Coordinates has not been removed :(', 'maps');
-                }
-            } elseif (
-                isset($post['latitude'])
-                && isset($post['longitude'])
-            ) {
-                $res = $coords->setCoords(
-                    $id,
-                    (float)$post['latitude'],
-                    (float)$post['longitude']
-                );
-
-                if ($res === true) {
-                    $message = _T('New coordinates has been stored!', 'maps');
-                } else {
-                    $error = _T('Coordinates has not been stored :(', 'maps');
+                    $status = 500;
                 }
             } else {
-                $error = _T('Something went wrong :(', 'maps');
+                $latitude = filter_var($post['latitude'] ?? null, FILTER_VALIDATE_FLOAT);
+                $longitude = filter_var($post['longitude'] ?? null, FILTER_VALIDATE_FLOAT);
+                if (
+                    $latitude === false
+                    || $longitude === false
+                    || abs($latitude) > 90
+                    || abs($longitude) > 180
+                ) {
+                    $error = _T('Invalid coordinates.', 'maps');
+                    $status = 400;
+                } else {
+                    try {
+                        $this->coordinates->set($id, $latitude, $longitude);
+                        $message = _T('New coordinates has been stored!', 'maps');
+                    } catch (\Throwable $e) {
+                        Analog::log(
+                            'Unable to store coordinates of member #' . $id . ' | ' . $e->getMessage(),
+                            Analog::ERROR
+                        );
+                        $error = _T('Coordinates has not been stored :(', 'maps');
+                        $status = 500;
+                    }
+                }
             }
         }
 
-        $response = $response->withHeader('Content-type', 'application/json');
-
-        $res = [
-            'res'       => $error === null,
-            'message'   => ($error ?? $message)
-        ];
-
-        $body = $response->getBody();
-        $body->write(json_encode($res));
-
-        return $response;
+        return $this->withJson(
+            $response,
+            [
+                'res'       => $error === null,
+                'message'   => ($error ?? $message)
+            ],
+            $status
+        );
     }
 }

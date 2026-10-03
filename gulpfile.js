@@ -1,3 +1,9 @@
+/**
+ * This file is part of Galette Maps plugin (https://galette.eu).
+ * SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 const gulp = require('gulp');
 
 const { series, parallel } = require('gulp');
@@ -7,6 +13,7 @@ const uglify = require('gulp-uglify');
 const merge = require('ordered-read-streams');
 const replace = require('gulp-replace');
 const cleancss = require('gulp-clean-css');
+const esbuild = require('esbuild');
 
 const plugin = {
   'public': './webroot'
@@ -31,6 +38,23 @@ const main_scripts = [
   './node_modules/leaflet-legend/leaflet-legend.js'
 ];
 
+const gl_styles = [
+  './node_modules/maplibre-gl/dist/maplibre-gl.css'
+];
+
+// maplibre-gl ships ES modules only since 6.x, so its bundle cannot be built by
+// concatenation like the others: esbuild rolls it up, along with the Leaflet
+// binding, into a classic script still exposing the `maplibregl` global.
+const gl_entry = './build/maps-gl.js';
+// Leaflet comes from maps-main.bundle.min.js, so the bundle must reuse the one
+// on the page instead of embedding a second copy.
+const gl_aliases = {
+  'leaflet': './build/leaflet-global.js'
+};
+// maplibre-gl runs its tile parsing in a worker it fetches at runtime; it has to
+// be a file of its own, next to the bundle.
+const gl_worker = './node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs';
+
 const main_assets = [
   {
     'src': './node_modules/leaflet/dist/images/*',
@@ -51,6 +75,7 @@ function clean(cb) {
     plugin.public + '/**',
     '!' + plugin.public,
     '!' + plugin.public + '/galette_maps.css',
+    '!' + plugin.public + '/galette_maps.js',
     plugin.public + '/images/**',
     '!' + plugin.public + '/images',
     '!' + plugin.public + '/images/marker-galette.png',
@@ -75,7 +100,12 @@ function styles() {
     .pipe(concat('maps-locate.bundle.min.css'))
     .pipe(gulp.dest(plugin.public));
 
-  return merge(main, locate);
+    gl = gulp.src(gl_styles)
+    .pipe(cleancss())
+    .pipe(concat('maps-gl.bundle.min.css'))
+    .pipe(gulp.dest(plugin.public));
+
+  return merge(main, locate, gl);
 };
 
 function scripts() {
@@ -94,6 +124,27 @@ function scripts() {
   return merge(main, locate);
 };
 
+function gl_scripts() {
+  return Promise.all([
+    esbuild.build({
+      entryPoints: [gl_entry],
+      outfile: plugin.public + '/maps-gl.bundle.min.js',
+      bundle: true,
+      minify: true,
+      format: 'iife',
+      globalName: 'maplibregl',
+      alias: gl_aliases
+    }),
+    esbuild.build({
+      entryPoints: [gl_worker],
+      outfile: plugin.public + '/maps-gl.worker.min.js',
+      bundle: true,
+      minify: true,
+      format: 'esm'
+    })
+  ]);
+};
+
 function assets() {
   main = main_assets.map(function (asset) {
     return gulp.src(asset.src, {encoding: false})
@@ -108,7 +159,8 @@ exports.clean = clean;
 
 exports.styles = styles;
 exports.scripts = scripts;
+exports.gl_scripts = gl_scripts;
 exports.assets = assets;
 
-exports.build = series(styles, scripts, assets);
+exports.build = series(styles, scripts, gl_scripts, assets);
 exports.default = exports.build;

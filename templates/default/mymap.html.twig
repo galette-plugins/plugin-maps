@@ -1,61 +1,41 @@
 {#
-/**
- * Copyright © 2003-2024 The Galette Team
- *
- * This file is part of Galette (https://galette.eu).
- *
- * Galette is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Galette is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Galette. If not, see <http://www.gnu.org/licenses/>.
- */
-#}
+ # This file is part of Galette Maps plugin (https://galette.eu).
+ # SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ # SPDX-License-Identifier: GPL-3.0-or-later
+ #}
+
 {% extends 'page.html.twig' %}
 
 {% block content %}
 <section class="map-container">
     <div id="map"></div>
 {% if towns is defined and towns|length > 0 %}
-    <div id="possible_towns" class="ui tiny modal">
-        <div class="header">
+    <div id="possible_towns" class="ui tiny modal" role="dialog" aria-modal="true" aria-labelledby="possible_towns_title">
+        <div class="header" id="possible_towns_title">
         {% if mymap is defined %}
             {{ _T("Choose your location", "maps") }}
         {% else %}
-            {{ _T("Choose %member location", "maps")|replace({'%member': member.sname}) }}
+            {{ _T("Choose %1$s location", "maps")|format(member.sname) }}
         {% endif %}
         </div>
         <div class="content">
             <div class="description">
                 <p>{{ _T("Select your town.", "maps") }}<br/>
-                {{ _T("In the database, town is set to: '%town'", "maps")|replace({'%town': member.town}) }}</p>
-                <ul>
-                </ul>
+                {{ _T("In the database, town is set to: '%1$s'", "maps")|format(member.town) }}</p>
             </div>
         </div>
         <div class="actions">
             <ul>
         {% for t in towns %}
                 <li>
-                    <div class="ui labeled fluid button">
-                        <div class="ui green button city">
-                            {{ t.full_name }}
-                        </div>
-                        <a class="ui basic label">
-                            <span class="lat">{{ t.latitude }}</span>/<span class="lon">{{ t.longitude }}</span>
-                        </a>
-                    </div>
+                    <button type="button" class="ui labeled button maps-town" data-name="{{ t.full_name }}" data-lat="{{ t.latitude }}" data-lng="{{ t.longitude }}">
+                        <span class="ui green button city">{{ t.full_name }}</span>
+                        <span class="ui basic label">{{ t.latitude }}/{{ t.longitude }}</span>
+                    </button>
                 </li>
         {% endfor %}
             </ul>
-            <div class="ui button cancel">{{ _T("Close") }}</div>
+            <button type="button" class="ui button cancel">{{ _T("Close") }}</button>
         </div>
     </div>
 {% endif %}
@@ -64,127 +44,14 @@
 {% endblock %}
 
 {% block javascripts %}
-{% include '@PluginGaletteMaps/common_scripts.html.twig' %}
-{% if cur_route != 'maps_map' %}
-<script type="text/javascript">
-    var _mapsBinded = function(map)
-    {
-
-        function onMapClick(e) {
-            var popup = L.popup();
-            popup
-                .setLatLng(e.latlng)
-                .setContent('SELECTPOPUP')
-                .openOn(map);
-        }
-
-        map.on('click', onMapClick);
-
-        //bind "I live here" event on popupopen
-        map.on('popupopen', function(e){
-            var _popup = e.popup;
-            var _container = $(_popup._container);
-            if ( _container.find('#removecoords').length > 0 ) {
-                _bind_removecoords();
-            } else if ( _container.find('.leaflet-popup-content').html() == 'SELECTPOPUP' ) {
-                var _clat = _popup._latlng.lat.toString();
-                var _clng = _popup._latlng.lng.toString();
-                var _id = 'coords';
-
-                _popup.setContent('<p>' + '{{ _T("You clicked at %p", "maps")|e("js") }}'.replace('%p', '<em>' + _clat + '/' + _clng + '</em>') + '</p><p><a class="ilivehere ui button" id="' + _id + '" href="#">{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}</a></p>');
+    {% include '@PluginGaletteMaps/common_scripts.html.twig' with {
+        page_config: {
+            member: {
+                name: member.sfullname,
+                can_edit: can_edit,
+                position: town ?? null,
+                store_url: mymap is defined ? url_for("maps_ilivehere") : url_for("maps_ilivehere", {"id": member.id})
             }
-
-            var _links = $(_container).find('a.ilivehere');
-            _a = $(_links[0]);
-            _a.data('latlng', e.popup._latlng);
-            _iLiveHere(_a.attr('id'));
-        });
-
-
-{% if town is defined %}
-        {# Town is known, just display #}
-        var _lat = {{ town['latitude'] }};
-        var _lon = {{ town['longitude'] }};
-
-        var _bind_removecoords = function(){
-            $('#removecoords').click(function(){
-                $('body').modal({
-                    title: '{% if mymap is defined %}{{ _T("Remove my coordinates", "maps")|e("js") }}{% else %}{{ _T("Remove member coordinates", "maps")|e("js") }}{% endif %}',
-                    class: 'tiny',
-                    content: '{{ _T("Are you sure you want to remove coordinates from the database?", "maps")|e("js") }}',
-                    actions: [{
-                        text    : '{{ _T("Remove")|e('js') }}',
-                        class   : 'red confirm_remove',
-                        icon    : 'trash alt',
-                        click   : function() {
-                            $.ajax({
-                                url: '{% if mymap is defined %}{{ url_for("maps_ilivehere") }}{% else %}{{ url_for("maps_ilivehere", {"id": member.id}) }}{% endif %}',
-                                type: 'POST',
-                                data: {
-                                    remove: true
-                                },
-                                {% include "elements/js/loader.js.twig" with {
-                                        selector: '.confirm_remove',
-                                        loader: 'button'
-                                } %},
-                                success: function(res){
-                                    setTimeout(function() {
-                                        $('body').modal({
-                                            class: 'tiny',
-                                            content: res.message,
-                                            actions: [{
-                                                text    : '{{ _T("Close")|e('js') }}',
-                                                click   : function() {
-                                                    window.location.reload();
-                                                }
-                                            }],
-                                            className: {
-                                                'title': 'center aligned header',
-                                                'content': 'center aligned content',
-                                                'actions': 'center aligned actions'
-                                            },
-                                        }).modal('show');
-                                    }, "500")
-                                },
-                                error: function() {
-                                    window.alert("{{ _T("An error occured removing coordinates :(", "maps")|e('js') }}");
-                                }
-                            });
-                        }
-                    }, {
-                        text    : '{{ _T("Close")|e('js') }}'
-                    }],
-                    className: {
-                        'title': 'center aligned header',
-                        'content': 'center aligned content',
-                        'actions': 'center aligned actions'
-                    },
-                }).modal('show');
-            });
-        };
-
-        L.marker([_lat, _lon], {icon: galetteIcon}).addTo(map)
-            .bindPopup('<strong>{{ member.sfullname|escape }}</strong><br/>{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}<br/><span id="removecoords" class="ui button">{{ _T("Remove")|e("js") }}</span>').openPopup();
-{% else %}
-        {# Town is not known. Show possibilities #}
-        var _towns = $('#possible_towns');
-
-        _towns.modal('show');
-
-        _towns.find('.button').click(function(e){
-            var _elt = $(this);
-            var _name = _elt.find('.city')[0].innerHTML;
-            var _slat = _elt.find('.lat')[0].innerHTML;
-            var _slon = _elt.find('.lon')[0].innerHTML;
-
-            map.setView([parseFloat(_slat), parseFloat(_slon)], 13);
-            var _id = 'coords';
-            _towns.modal('hide');
-            L.marker([_slat, _slon]).addTo(map)
-                .bindPopup('<p><strong>' + _name  + '</strong><br/><em>' + _slat + '/' + _slon + '</em></p><p><a class="ilivehere ui button" id="' + _id + '" href="#">{% if mymap is defined %}{{ _T("I live here!", "maps")|e("js") }}{% else %}{{ _T("Member lives here!", "maps")|e("js") }}{% endif %}</a></p>').openPopup();
-        });
-{% endif %}
-    }
-</script>
-{% endif %}
+        }
+    } %}
 {% endblock %}

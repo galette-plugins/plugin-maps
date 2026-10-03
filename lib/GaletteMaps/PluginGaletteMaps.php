@@ -1,29 +1,23 @@
 <?php
 
 /**
- * Copyright © 2003-2025 The Galette Team
- *
- * This file is part of Galette (https://galette.eu).
- *
- * Galette is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Galette is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Galette. If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Galette Maps plugin (https://galette.eu).
+ * SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 declare(strict_types=1);
 
 namespace GaletteMaps;
 
+use DI\Attribute\Inject;
+use Galette\Core\Db;
 use Galette\Core\Login;
+use Galette\Core\Plugins\InstallableInterface;
+use Galette\Core\Plugins\MenuProviderInterface;
+use Galette\Core\Plugins\DashboardProviderInterface;
+use Galette\Core\Plugins\MemberActionProviderInterface;
+use Galette\Core\Plugins\PreferencesProviderInterface;
 use Galette\Entity\Adherent;
 use Galette\Core\GalettePlugin;
 
@@ -33,20 +27,46 @@ use Galette\Core\GalettePlugin;
  * @author Johan Cwiklinski <johan@x-tnd.be>
  */
 
-class PluginGaletteMaps extends GalettePlugin
+class PluginGaletteMaps extends GalettePlugin implements InstallableInterface, MenuProviderInterface, DashboardProviderInterface, MemberActionProviderInterface, PreferencesProviderInterface
 {
+    #[Inject]
+    private readonly Db $zdb; //@phpstan-ignore property.uninitializedReadonly, property.onlyRead (injected from DI)
+    #[Inject]
+    private readonly Login $login; //@phpstan-ignore property.uninitializedReadonly, property.onlyRead (injected from DI)
+
+    /**
+     * Get the preferences the plugin declares
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function getPreferences(): array
+    {
+        return TileProviders::getSchema() + Precision::getSchema();
+    }
+
     /**
      * Extra menus entries
      *
      * @return array<string|int, string|array<string,mixed>>
      */
-    public static function getMenusContents(): array
+    public function getMenus(): array
     {
-        /** @var Login $login */
-        global $login;
         $menus = [];
 
-        if ($login->isLogged() && !$login->isSuperAdmin()) {
+        if ($this->login->isAdmin()) {
+            $menus['configuration'] = [
+                'items' => [
+                    [
+                        'label' => _T('Maps settings', 'maps'),
+                        'route' => [
+                            'name' => 'maps_preferences',
+                        ]
+                    ],
+                ]
+            ];
+        }
+
+        if ($this->login->isLogged() && !$this->login->isSuperAdmin()) {
             $menus['myaccount'] = [
                 'items' => [
                     [
@@ -67,7 +87,7 @@ class PluginGaletteMaps extends GalettePlugin
      *
      * @return array<int, string|array<string,mixed>>
      */
-    public static function getPublicMenusItemsList(): array
+    public function getPublicMenus(): array
     {
         return [
             [
@@ -85,12 +105,9 @@ class PluginGaletteMaps extends GalettePlugin
      *
      * @return array<int, string|array<string,mixed>>
      */
-    public static function getMyDashboardsContents(): array
+    public function getMyDashboards(): array
     {
-        /** @var Login $login */
-        global $login;
-
-        if ($login->isSuperAdmin()) {
+        if ($this->login->isSuperAdmin()) {
             return [];
         }
 
@@ -99,7 +116,7 @@ class PluginGaletteMaps extends GalettePlugin
                 'label' => _T("My localization", "maps"),
                 'route' => [
                     'name' => 'maps_localize_member',
-                    'args' => ["id" => $login->id]
+                    'args' => ["id" => $this->login->id]
                 ],
                 'icon' => 'map'
             ]
@@ -111,7 +128,7 @@ class PluginGaletteMaps extends GalettePlugin
      *
      * @return array<int, string|array<string,mixed>>
      */
-    public static function getDashboardsContents(): array
+    public function getDashboards(): array
     {
         return [];
     }
@@ -121,17 +138,17 @@ class PluginGaletteMaps extends GalettePlugin
      *
      * @param Adherent $member Member instance
      *
-     * @return array|array[]
+     * @return array<int, string|array<string,mixed>>
      */
-    public static function getListActionsContents(Adherent $member): array
+    public function getListActions(Adherent $member): array
     {
         return [
             [
                 'label' => _T("Geolocalize", "maps"),
-                'title' => str_replace(
-                    '%membername',
-                    $member->sname,
-                    _T("Geolocalize %membername", "maps")
+                'title' => sprintf(
+                    //TRANS: parameter is the member name
+                    _T('Geolocalize %1$s', 'maps'),
+                    $member->sname
                 ),
                 'route' => [
                     'name' => 'maps_localize_member',
@@ -149,9 +166,9 @@ class PluginGaletteMaps extends GalettePlugin
      *
      * @return array<int, string|array<string,mixed>>
      */
-    public static function getDetailedActionsContents(Adherent $member): array
+    public function getDetailedActions(Adherent $member): array
     {
-        return static::getListActionsContents($member);
+        return $this->getListActions($member);
     }
 
     /**
@@ -159,8 +176,16 @@ class PluginGaletteMaps extends GalettePlugin
      *
      * @return array<int, string|array<string,mixed>>
      */
-    public static function getBatchActionsContents(): array
+    public function getBatchActions(): array
     {
         return [];
+    }
+
+    /**
+     * Is the plugin fully installed (including database, extra configuration, etc.)?
+     */
+    public function isInstalled(): bool
+    {
+        return $this->zdb->tableExists(MAPS_PREFIX . Coordinates::TABLE);
     }
 }

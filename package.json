@@ -1,6 +1,6 @@
 {
   "name": "plugin-maps",
-  "version": "2.0.0",
+  "version": "2.2.1",
   "description": "A [Galette](https://galette.eu) plugin to display maps",
   "main": "index.js",
   "scripts": {
@@ -9,12 +9,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git.tuxfamily.org/gitroot/galette/plugin-maps.git"
+    "url": "https://github.com/galette-plugins/plugin-maps.git"
   },
   "author": "Johan Cwiklinski <johan AT x-tnd DOT be>",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "del": "^8.0.1",
+    "del": "^6.1.1",
+    "esbuild": "^0.28.2",
     "gulp": "^5.0.1",
     "gulp-clean-css": "^4.3.0",
     "gulp-concat": "^2.6.1",
@@ -23,12 +24,14 @@
     "ordered-read-streams": "^2.0.0"
   },
   "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "leaflet": "^1.8.0",
-    "leaflet-control-geocoder": "^3.3.1",
+    "leaflet-control-geocoder": "^4.0.0",
     "leaflet-gesture-handling": "^1.2.2",
     "leaflet-legend": "^1.0.2",
-    "leaflet.fullscreen": "^5.1.1",
-    "leaflet.locatecontrol": "^0.85.1",
-    "leaflet.markercluster": "^1.5.3"
+    "leaflet.fullscreen": "^5.3.3",
+    "leaflet.locatecontrol": "^0.90.1",
+    "leaflet.markercluster": "^1.5.3",
+    "maplibre-gl": "^6.11.2"
   }
 }

@@ -1,148 +1,49 @@
 {#
-/**
- * Copyright © 2003-2024 The Galette Team
- *
- * This file is part of Galette (https://galette.eu).
- *
- * Galette is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Galette is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Galette. If not, see <http://www.gnu.org/licenses/>.
- */
-#}
-{% if cur_route starts with 'maps_' %}
+ # This file is part of Galette Maps plugin (https://galette.eu).
+ # SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ # SPDX-License-Identifier: GPL-3.0-or-later
+ #}
+
+{% if cur_route in ['maps_map', 'maps_localize_member', 'maps_mymap'] %}
     <script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "maps-main.bundle.min.js"}) }}"></script>
+    {% if tiles.vector %}
+    {# a megabyte of MapLibre, only worth loading for a vector background #}
+    <script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "maps-gl.bundle.min.js"}) }}"></script>
+    {% endif %}
 {% endif %}
 {% if cur_route == 'maps_localize_member' or cur_route == 'maps_mymap' %}
     <script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "maps-locate.bundle.min.js"}) }}"></script>
 {% endif %}
 
-<script type="text/javascript">
-    /**
-     * Galette specific marker icon
-     */
-    const galetteIcon = L.icon({
-        iconUrl: '{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette.png"}) }}',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-    const galetteProIcon = L.icon({
-        iconUrl: '{{ url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette-pro.png"}) }}',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-
-{% if cur_route != 'maps_map' %}
-    function _iLiveHere(_id){
-        $('#' + _id).click(function(e, f,g){
-            var _a = $(this);
-            var _latlng = _a.data('latlng');
-            $.ajax({
-                url: '{% if mymap is defined %}{{ url_for("maps_ilivehere") }}{% else %}{{ url_for("maps_ilivehere", {"id": member.id}) }}{% endif %}',
-                type: 'POST',
-                data: {
-                    latitude: _latlng.lat,
-                    longitude: _latlng.lng
-                },
-                {% include "elements/js/loader.js.twig" with {
-                    selector: '#coords',
-                    loader: 'button'
-                } %},
-                success: function(res){
-                    $('body').modal({
-                        class: 'tiny',
-                        content: res.message,
-                        actions: [{
-                            text    : '{{ _T("Close")|e('js') }}',
-                            click   : function() {
-                                window.location.reload();
-                            }
-                        }],
-                        className: {
-                            'title': 'center aligned header',
-                            'content': 'center aligned content',
-                            'actions': 'center aligned actions'
-                        },
-                    }).modal('show');
-                },
-                error: function(){
-                    alert("{{ _T("An error occured during 'I live here' process :(", "maps")|e("js") }}")
-                }
-            });
-            return false;
-        });
+{% set is_member_page = cur_route == 'maps_localize_member' or cur_route == 'maps_mymap' %}
+{% set maps_config = {
+    icons: {
+        member: url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette.png"}),
+        company: url_for("plugin_res", {"plugin": module_id, "path": "images/marker-galette-pro.png"})
+    },
+    tiles: tiles,
+    center: town is defined ? {lat: town['latitude'], lng: town['longitude'], zoom: 12} : {lat: 46.830133640447386, lng: 2.4609375, zoom: 6},
+    locate: is_member_page,
+    strings: {
+        close: _T("Close"),
+        legend: _T("Legend"),
+        remove: _T("Remove"),
+        fullscreen: _T("Display map in full screen", "maps"),
+        fullscreen_exit: _T("Exit full screen", "maps"),
+        search_placeholder: (cur_route == 'maps_localize_member' and town is not defined) ? _T("Search your town...", "maps") : _T("Search a town...", "maps"),
+        search_error: _T("Sorry, that town could not be found.", "maps"),
+        search: _T("Search", "maps"),
+        locate: _T("Show me where I am", "maps"),
+        locate_outside: _T("You seem located outside the boundaries of the map", "maps"),
+        aka: _T("aka", "maps"),
+        clicked_at: _T("You clicked at %1$s", "maps"),
+        lives_here: mymap is defined ? _T("I live here!", "maps") : _T("Member lives here!", "maps"),
+        remove_title: mymap is defined ? _T("Remove my coordinates", "maps") : _T("Remove member coordinates", "maps"),
+        remove_confirm: _T("Are you sure you want to remove coordinates from the database?", "maps"),
+        store_error: _T("An error occurred during 'I live here' process :(", "maps"),
+        remove_error: _T("An error occurred removing coordinates :(", "maps")
     }
-{% endif %}
-
-    $(function(){
-        var _lat = {% if town is defined %}{{ town['latitude'] }}{% else %}46.830133640447386{% endif %};
-        var _lon = {% if town is defined %}{{ town['longitude'] }}{% else %}2.4609375{% endif %};
-        var map = L.map(
-            'map', {
-                gestureHandling: true
-            }
-        ).setView([_lat, _lon], {% if town is defined %}12{% else %}6{% endif %});
-
-        new L.Control.FullScreen({
-            position: 'topleft',
-            title: "{{ _T("Display map in full screen", "maps")|e("js") }}",
-            titleCancel:"{{ _T("Exit full screen", "maps")|e("js") }}",
-            forceSeparateButton: true
-        }).addTo(map);
-
-        var _geocoder = {
-            collapsed: false,
-{% if cur_route == 'maps_localize_member' and town is not defined %}
-            placeholder: '{{ _T("Search your town...", "maps")|e("js") }}',
-{% else %}
-            placeholder: '{{ _T("Search a town...", "maps")|e("js") }}',
-{% endif %}
-            errorMessage: '{{ _T("Sorry, that town could not be found.", "maps")|e("js") }}',
-            iconLabel: '{{ _T("Search", "maps")|e("js") }}',
-        };
-        L.Control.geocoder(_geocoder).addTo(map);
-
-        var _legend =  new L.Control.Legend({
-            position: 'topright',
-        });
-        map.addControl(_legend);
-
-        $('.legend-container').append( $('#legend') );
-        $('.legend-toggle').append( '<span class="legend-toggle-icon"><i class="big info circle blue icon"></i> {{ _T("Legend") }}</span>' );
-
-{% if cur_route == 'maps_localize_member' or cur_route == 'maps_mymap' %}
-        L.control.locate({
-            strings: {
-                title: '{{ _T("Show me where I am", "maps")|e("js") }}',
-                popup: 'SELECTPOPUP',
-                outsideMapBoundsMsg: '{{ _T("You seem located outside the boundaries of the map", "maps")|e("js") }}'
-            }
-        }).addTo(map);
-{% endif %}
-
-        L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '{{ _T("Map data (c)", "maps")|e("js") }} <a href="http://openstreetmap.org">{{ _T("OpenStreetMap contributors", "maps")|e("js") }}</a>, {{ _T("Imagery (c)", "maps")|e("js") }} <a href="https://cartodb.com/attributions">CartoDB</a>'
-        }).addTo(map);
-
-        try {
-            _mapsBinded(map);
-        } catch (err) {
-            //fortunately, nothing to do here.
-            //_mapsBinded function can be missing
-        }
-    });
-</script>
-
+}|merge(page_config ?? {}) %}
+{# HEX flags keep "</script>" and friends harmless inside the script element #}
+<script type="application/json" id="maps-config">{{ maps_config|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_HEX_APOS') b-or constant('JSON_HEX_QUOT'))|raw }}</script>
+<script type="text/javascript" src="{{ url_for("plugin_res", {"plugin": module_id, "path": "galette_maps.js"}) }}"></script>

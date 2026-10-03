@@ -1,0 +1,329 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Jože Felicijan <joze@felicijan.com>, 2026.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: translations@galette.eu\n"
+"POT-Creation-Date: 2026-09-30 12:06+0200\n"
+"PO-Revision-Date: 2026-09-28 08:56+0000\n"
+"Last-Translator: Jože Felicijan <joze@felicijan.com>\n"
+"Language-Team: Slovenian <https://hosted.weblate.org/projects/galette/maps-"
+"plugin/sl/>\n"
+"Language: sl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3;\n"
+"X-Generator: Weblate 2026.10.dev0\n"
+
+#: ../_routes.php:22
+msgid "Javascript libraries has not been built!"
+msgstr "Knjižnice Javascripta še niso bile zgrajene!"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:81
+#: ../lib/GaletteMaps/Controllers/MapsController.php:176
+#: ../lib/GaletteMaps/PluginGaletteMaps.php:94
+msgid "Maps"
+msgstr "Zemljevidi"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:99
+msgid ""
+"Coordinates has not been loaded. Maybe plugin tables does not exists in the "
+"database?"
+msgstr ""
+"Koordinate niso bile naložene. Morda tabele vtičnikov ne obstajajo v zbirki "
+"podatkov?"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:124
+#: ../lib/GaletteMaps/Controllers/MapsController.php:328
+msgid "Superadmin cannot be localized."
+msgstr "Superadministratorja ni mogoče lokalizirati."
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:170
+msgid ""
+"Town search is not available for now, you can still search or click on the "
+"map."
+msgstr ""
+"Iskanje mest trenutno ni na voljo; še vedno pa lahko iščete ali kliknete na "
+"zemljevid."
+
+#. TRANS: parameter is the member name
+#: ../lib/GaletteMaps/Controllers/MapsController.php:178
+#, php-format
+msgid "%1$s geographic position"
+msgstr "Geografski položaj %1$s"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:216
+#: ../lib/GaletteMaps/PluginGaletteMaps.php:60
+msgid "Maps settings"
+msgstr "Nastavitve zemljevidov"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:254
+msgid "Unknown position precision."
+msgstr "Natančnost položaja ni znana."
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:278
+msgid "An address is required to use your own background map."
+msgstr "Za uporabo lastnega zemljevida ozadja je potreben naslov."
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:297
+msgid "Maps settings have been saved."
+msgstr "Nastavitve zemljevidov so shranjene."
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:353
+msgid "Coordinates has been removed!"
+msgstr "Koordinate so bile odstranjene!"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:359
+msgid "Coordinates has not been removed :("
+msgstr "Koordinate niso bile odstranjene :("
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:371
+msgid "Invalid coordinates."
+msgstr "Neveljavne koordinate."
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:376
+msgid "New coordinates has been stored!"
+msgstr "Nove koordinate so shranjene!"
+
+#: ../lib/GaletteMaps/Controllers/MapsController.php:382
+msgid "Coordinates has not been stored :("
+msgstr "Koordinate niso shranjene :("
+
+#: ../lib/GaletteMaps/TileProviders.php:123
+msgid "OpenFreeMap, light grey"
+msgstr "OpenFreeMap, svetlo siva"
+
+#: ../lib/GaletteMaps/TileProviders.php:124
+msgid "OpenFreeMap, colours"
+msgstr "OpenFreeMap, barve"
+
+#: ../lib/GaletteMaps/TileProviders.php:125
+msgid "OpenStreetMap"
+msgstr "Open Street Map"
+
+#: ../lib/GaletteMaps/TileProviders.php:126
+msgid "OpenStreetMap France"
+msgstr "OpenStreetMap Francija"
+
+#: ../lib/GaletteMaps/TileProviders.php:127
+msgid "Humanitarian OSM Team"
+msgstr "Humanitarna ekipa OSM"
+
+#: ../lib/GaletteMaps/TileProviders.php:128
+msgid "OpenStreetMap Germany"
+msgstr "OpenStreetMap Nemčija"
+
+#: ../lib/GaletteMaps/TileProviders.php:129
+msgid "Esri, light grey"
+msgstr "Esri, svetlo siva"
+
+#: ../lib/GaletteMaps/TileProviders.php:130
+#: ../templates/default/maps_preferences.html.twig:33
+msgid "Your own values"
+msgstr "Vaše lastne vrednote"
+
+#: ../lib/GaletteMaps/PluginGaletteMaps.php:73
+#: ../lib/GaletteMaps/PluginGaletteMaps.php:116
+msgid "My localization"
+msgstr "Moja lokalizacija"
+
+#: ../lib/GaletteMaps/PluginGaletteMaps.php:147
+msgid "Geolocalize"
+msgstr "Geolokaliziraj"
+
+#. TRANS: parameter is the member name
+#: ../lib/GaletteMaps/PluginGaletteMaps.php:150
+#, php-format
+msgid "Geolocalize %1$s"
+msgstr "Geolokaliziraj %1$s"
+
+#: ../lib/GaletteMaps/Precision.php:131
+msgid "About 100 km"
+msgstr "Približno 100 km"
+
+#: ../lib/GaletteMaps/Precision.php:132
+msgid "About 50 km"
+msgstr "Približno 50 km"
+
+#: ../lib/GaletteMaps/Precision.php:133
+msgid "About 5 km"
+msgstr "Približno 5 km"
+
+#: ../lib/GaletteMaps/Precision.php:134
+msgid "About 500 m"
+msgstr "Približno 500 m"
+
+#: ../lib/GaletteMaps/Precision.php:135
+msgid "About 50 m"
+msgstr "Približno 50 m"
+
+#: ../lib/GaletteMaps/Precision.php:136
+msgid "Exact position"
+msgstr "Natančen položaj"
+
+#: ../templates/default/common_scripts.html.twig:26
+msgid "Display map in full screen"
+msgstr "Prikaži zemljevid v celozaslonskem načinu"
+
+#: ../templates/default/common_scripts.html.twig:26
+msgid "Exit full screen"
+msgstr "Izhod iz celozaslonskega načina"
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "Search your town..."
+msgstr "Poiščite svoje mesto ..."
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "Search a town..."
+msgstr "Iskanje mesta ..."
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "Sorry, that town could not be found."
+msgstr "Žal tega mesta ni bilo mogoče najti."
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "Search"
+msgstr "Iskanje"
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "Show me where I am"
+msgstr "Pokaži mi, kje sem"
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "You seem located outside the boundaries of the map"
+msgstr "Zdi se, da se nahajaš zunaj meja zemljevida"
+
+#: ../templates/default/common_scripts.html.twig:33
+msgid "aka"
+msgstr "oz."
+
+#: ../templates/default/common_scripts.html.twig:33
+#, php-format
+msgid "You clicked at %1$s"
+msgstr "Kliknili ste ob %1$s"
+
+#: ../templates/default/common_scripts.html.twig:40
+msgid "I live here!"
+msgstr "Živim tukaj!"
+
+#: ../templates/default/common_scripts.html.twig:40
+msgid "Member lives here!"
+msgstr "Član živi tukaj!"
+
+#: ../templates/default/common_scripts.html.twig:41
+msgid "Remove my coordinates"
+msgstr "Odstrani moje koordinate"
+
+#: ../templates/default/common_scripts.html.twig:41
+msgid "Remove member coordinates"
+msgstr "Odstrani koordinate člana"
+
+#: ../templates/default/common_scripts.html.twig:41
+msgid "Are you sure you want to remove coordinates from the database?"
+msgstr "Ali ste prepričani, da želite odstraniti koordinate iz baze podatkov?"
+
+#: ../templates/default/common_scripts.html.twig:41
+msgid "An error occurred during 'I live here' process :("
+msgstr "Med postopkom »Živim tukaj« je prišlo do napake :("
+
+#: ../templates/default/common_scripts.html.twig:41
+msgid "An error occurred removing coordinates :("
+msgstr "Pri odstranjevanju koordinat je prišlo do napake :("
+
+#: ../templates/default/maps_preferences.html.twig:15
+msgid "Members positions precision"
+msgstr "Natančnost položajev elementov"
+
+#: ../templates/default/maps_preferences.html.twig:15
+msgid ""
+"How far from their stored position members may appear on the map. Staff, "
+"administrators and members themselves always see the exact position."
+msgstr ""
+"Kako daleč od svoje shranjene lokacije se lahko člani prikažejo na "
+"zemljevidu. Osebje, skrbniki in člani sami vedno vidijo točno lokacijo."
+
+#: ../templates/default/maps_preferences.html.twig:26
+msgid "Background map provider"
+msgstr "Ponudnik zemljevidov v ozadju"
+
+#: ../templates/default/maps_preferences.html.twig:38
+msgid "Vector tiles"
+msgstr "Vektorske ploščice"
+
+#: ../templates/default/maps_preferences.html.twig:38
+msgid "Tick for a MapLibre style, leave unticked for classic raster tiles."
+msgstr ""
+"Označite za slog MapLibre, pustite neoznačeno za klasične rastrske ploščice."
+
+#: ../templates/default/maps_preferences.html.twig:46
+msgid "Address"
+msgstr "Naslov"
+
+#: ../templates/default/maps_preferences.html.twig:46
+msgid "Style address for vector tiles, tiles address for raster ones, such as:"
+msgstr ""
+"Naslov sloga za vektorske ploščice, naslov ploščic za rastrske, kot so:"
+
+#: ../templates/default/maps_preferences.html.twig:53
+msgid "Attribution"
+msgstr "Pripisovanje"
+
+#: ../templates/default/maps_preferences.html.twig:53
+msgid ""
+"Credit the provider requires, HTML allowed. Data licences make it mandatory."
+msgstr "Kredit ponudnik zahteva, HTML dovoljen. Podatkovne licence so obvezne."
+
+#: ../templates/default/maps_preferences.html.twig:60
+msgid "Maximum zoom"
+msgstr "Največja povečava"
+
+#: ../templates/default/maps_preferences.html.twig:68
+msgid "Subdomains"
+msgstr "Poddomene"
+
+#: ../templates/default/maps_preferences.html.twig:68
+msgid ""
+"Letters the {s} token in the address is replaced with, such as abc. Raster "
+"tiles only."
+msgstr ""
+"Črke, s katerimi je zamenjan žeton {s} v naslovu, na primer abc. Samo "
+"rastrske ploščice."
+
+#: ../templates/default/mymap.html.twig:16
+msgid "Choose your location"
+msgstr "Izberite svojo lokacijo"
+
+#: ../templates/default/mymap.html.twig:18
+#, php-format
+msgid "Choose %1$s location"
+msgstr "Izberite lokacijo %1$s"
+
+#: ../templates/default/mymap.html.twig:23
+msgid "Select your town."
+msgstr "Izberite svoje mesto."
+
+#: ../templates/default/mymap.html.twig:24
+#, php-format
+msgid "In the database, town is set to: '%1$s'"
+msgstr "V podatkovni bazi je mesto nastavljeno na: '%1$s'"
+
+#: ../templates/default/common_html.html.twig:16
+msgid "Member (company)"
+msgstr "Član (podjetje)"
+
+#: ../templates/default/common_html.html.twig:20
+msgid "Search result"
+msgstr "Rezultat iskanja"
+
+#~ msgid "Something went wrong :("
+#~ msgstr "Nekaj je šlo narobe :("
+
+#~ msgid "Map data (c)"
+#~ msgstr "Podatki zemljevida (c)"
+
+#~ msgid "Imagery (c)"
+#~ msgstr "Posnetki (c)"

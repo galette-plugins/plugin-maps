@@ -9,3 +9,6 @@ webroot/images/*
 !webroot/images/marker-galette-pro.png
 tempcache/
 tests/coverage/
+
+# compiled translations, built by bin/console galette:compile-locales
+lang/*/LC_MESSAGES/*.mo

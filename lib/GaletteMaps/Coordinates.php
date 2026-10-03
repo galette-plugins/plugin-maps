@@ -1,193 +1,132 @@
 <?php
 
 /**
- * Copyright © 2003-2025 The Galette Team
- *
- * This file is part of Galette (https://galette.eu).
- *
- * Galette is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Galette is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Galette. If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of Galette Maps plugin (https://galette.eu).
+ * SPDX-FileCopyrightText: Copyright © 2012-2026 The Galette Team
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 declare(strict_types=1);
 
 namespace GaletteMaps;
 
-use Analog\Analog;
-use ArrayObject;
 use Galette\Core\Db;
+use Galette\Core\Login;
 use Galette\Entity\Adherent;
-use Laminas\Db\Sql\Expression;
-use Laminas\Db\Sql\Predicate\PredicateSet;
-use Laminas\Db\Sql\Predicate\Operator;
 
 /**
  * Members GPS coordinates
+ *
+ * Errors are not caught here: callers know what the user was trying to do,
+ * and log it along with the database message.
  *
  * @author Johan Cwiklinski <johan@x-tnd.be>
  */
 
 class Coordinates
 {
-    public const TABLE = 'coordinates';
-    public const PK = 'id_adh';
+    public const string TABLE = 'coordinates';
+    public const string PK = 'id_adh';
 
     /**
-     * Retrieve member coordinates
+     * Constructor
      *
-     * @param int $id Member id
-     *
-     * @return array<string>|ArrayObject<string, int|string>
+     * @param Db    $zdb   Database instance
+     * @param Login $login Logged-in user, whose rights filter the list
      */
-    public function getCoords(int $id): array|ArrayObject
-    {
-        /** @var Db $zdb */
-        global $zdb;
-
-        try {
-            $select = $zdb->select($this->getTableName());
-            $select->where([self::PK => $id]);
-            $results = $zdb->execute($select);
-
-            if ($results->count() > 0) {
-                return $results->current();
-            } else {
-                return [];
-            }
-        } catch (\Exception $e) {
-            if ($e->getCode() == '42S02') {
-                Analog::log(
-                    'Maps coordinates table does not exists',
-                    Analog::WARNING
-                );
-            } else {
-                Analog::log(
-                    'Unable to retrieve members coordinates for "'
-                    . $id . '". | ' . $e->getMessage(),
-                    Analog::WARNING
-                );
-            }
-            throw $e;
-        }
+    public function __construct(
+        private readonly Db $zdb,
+        private readonly Login $login
+    ) {
     }
 
     /**
-     * Returns list of all know coordinates, filtered on publicly
-     * visible profile for non admins and non staff
+     * Get member coordinates
      *
-     * @return array<int, array<string,mixed>>
+     * @param int $id Member id
+     *
+     * @return ?array{latitude: string, longitude: string} null when member has no coordinates
      */
-    public function listCoords(): array
+    public function get(int $id): ?array
     {
-        global $zdb, $login;
+        $select = $this->zdb->select($this->getTableName());
+        $select->columns(['latitude', 'longitude'])->where([self::PK => $id]);
+        $row = $this->zdb->execute($select)->current();
 
-        try {
-            $select = $zdb->select($this->getTableName(), 'c');
-            $select->join(
-                [
-                    'a' => PREFIX_DB . Adherent::TABLE
-                ],
-                'a.' . self::PK . '=' . 'c.' . self::PK
-            )->where->equalTo(
-                'activite_adh',
-                new Expression('true')
-            );
-
-            if (
-                !$login->isAdmin()
-                && !$login->isStaff()
-                && !$login->isSuperAdmin()
-            ) {
-                //limit query to public up-to-date profiles
-                $select->where(
-                    [
-                        new PredicateSet(
-                            [
-                                new Operator(
-                                    'date_echeance',
-                                    '>=',
-                                    date('Y-m-d')
-                                ),
-                                new Operator(
-                                    'bool_exempt_adh',
-                                    '=',
-                                    new Expression('true')
-                                )
-                            ],
-                            PredicateSet::OP_OR
-                        ),
-                        new PredicateSet(
-                            [
-                                new Operator(
-                                    'bool_display_info',
-                                    '=',
-                                    new Expression('true')
-                                )
-                            ]
-                        )
-                    ]
-                );
-
-                if ($login->isLogged() && !$login->isSuperAdmin()) {
-                    $select->where(
-                        new PredicateSet(
-                            [
-                                new Operator(
-                                    'a.' . Adherent::PK,
-                                    '=',
-                                    $login->id
-                                )
-                            ]
-                        ),
-                        PredicateSet::OP_OR
-                    );
-                }
-            }
-
-            $results = $zdb->execute($select);
-
-            $res = [];
-            foreach ($results as $r) {
-                $a = new Adherent($zdb, $r);
-                $m = [
-                    'id_adh'    => $a->id,
-                    'lat'       => $r->latitude,
-                    'lng'       => $r->longitude,
-                    'name'      => $a->sname,
-                    'nickname'  => $a->nickname
-                ];
-                if ($a->isCompany()) {
-                    $m['company'] = $a->company_name;
-                }
-                $res[] = $m;
-            }
-
-            return $res;
-        } catch (\Exception $e) {
-            if ($e->getCode() == '42S02') {
-                Analog::log(
-                    'Maps coordinates table does not exists',
-                    Analog::WARNING
-                );
-            } else {
-                Analog::log(
-                    'Unable to retrieve members coordinates list "'
-                    . '". | ' . $e->getMessage(),
-                    Analog::WARNING
-                );
-            }
-            throw $e;
+        if ($row === null) {
+            return null;
         }
+
+        return [
+            'latitude'  => (string)$row['latitude'],
+            'longitude' => (string)$row['longitude']
+        ];
+    }
+
+    /**
+     * Get coordinates of the members logged-in user can see on the map
+     *
+     * Staff and administrators see every active member; others see active,
+     * up-to-date members who display their information, and their own position.
+     * Positions are snapped to the grid for them, except their own one.
+     *
+     * @param ?float $step Grid step positions are snapped to, in degrees; null for exact positions
+     *
+     * @return array<int, array{id_adh: int, lat: string, lng: string, approximate: bool, name: string, nickname: ?string, company?: string}>
+     */
+    public function listVisible(?float $step = null): array
+    {
+        $select = $this->zdb->select($this->getTableName(), 'c');
+        $select->join(
+            [
+                'a' => PREFIX_DB . Adherent::TABLE
+            ],
+            'a.' . self::PK . '=' . 'c.' . self::PK,
+            //only what the map displays
+            ['nom_adh', 'prenom_adh', 'pseudo_adh', 'societe_adh']
+        );
+        $where = $select->where;
+        $where->equalTo('a.activite_adh', right: true);
+
+        $privileged = $this->login->isAdmin()
+            || $this->login->isStaff()
+            || $this->login->isSuperAdmin();
+
+        if (!$privileged) {
+            //limit query to public up-to-date profiles, and to logged-in member own one
+            $visible = $where->nest();
+            $public = $visible->nest();
+            $public->nest()
+                ->greaterThanOrEqualTo('a.date_echeance', date('Y-m-d'))
+                ->or->equalTo('a.bool_exempt_adh', right: true)
+                ->unnest();
+            $public->and->equalTo('a.bool_display_info', right: true);
+            $public->unnest();
+            if ($this->login->isLogged()) {
+                $visible->or->equalTo('a.' . Adherent::PK, $this->login->id);
+            }
+            $visible->unnest();
+        }
+
+        $res = [];
+        foreach ($this->zdb->execute($select) as $r) {
+            $id_adh = (int)$r[self::PK];
+            $approximate = $step !== null && !$privileged && $id_adh !== (int)$this->login->id;
+            $m = [
+                'id_adh'    => $id_adh,
+                'lat'       => $approximate ? Precision::snap($r['latitude'], $step) : (string)$r['latitude'],
+                'lng'       => $approximate ? Precision::snap($r['longitude'], $step) : (string)$r['longitude'],
+                'approximate' => $approximate,
+                'name'      => Adherent::getNameWithCase($r['nom_adh'], $r['prenom_adh']),
+                'nickname'  => $r['pseudo_adh']
+            ];
+            if (trim($r['societe_adh'] ?? '') !== '') {
+                $m['company'] = $r['societe_adh'];
+            }
+            $res[] = $m;
+        }
+
+        return $res;
     }
 
     /**
@@ -196,79 +135,40 @@ class Coordinates
      * @param int   $id        Member id
      * @param float $latitude  Latitude
      * @param float $longitude Longitude
-     *
-     * @return bool
      */
-    public function setCoords(int $id, float $latitude, float $longitude): bool
+    public function set(int $id, float $latitude, float $longitude): void
     {
-        global $zdb;
+        $values = [
+            'latitude'  => $latitude,
+            'longitude' => $longitude
+        ];
 
-        try {
-            $coords = $this->getCoords($id);
-            if (count($coords) === 0) {
-                //coordinates does not exist yet
-                $insert = $zdb->insert($this->getTableName());
-                $insert->values(
-                    [
-                        self::PK    => $id,
-                        'latitude'  => $latitude,
-                        'longitude' => $longitude
-                    ]
-                );
-                $results = $zdb->execute($insert);
-            } else {
-                //coordinates already exists, just update
-                $update = $zdb->update($this->getTableName());
-                $update->set(
-                    [
-                        'latitude'  => $latitude,
-                        'longitude' => $longitude
-                    ]
-                )->where(
-                    [self::PK => $id]
-                );
-                $results = $zdb->execute($update);
-            }
-            return ($results->count() > 0);
-        } catch (\Exception $e) {
-            Analog::log(
-                'Unable to set coordinates | ' . $e->getMessage(),
-                Analog::ERROR
-            );
-            return false;
+        if ($this->get($id) === null) {
+            $insert = $this->zdb->insert($this->getTableName());
+            $insert->values([self::PK => $id] + $values);
+            $this->zdb->execute($insert);
+        } else {
+            //no row is affected when the position does not change: not an error
+            $update = $this->zdb->update($this->getTableName());
+            $update->set($values)->where([self::PK => $id]);
+            $this->zdb->execute($update);
         }
     }
 
     /**
-     * Remove member coordinates
+     * Remove member coordinates; removing nothing is not an error
      *
      * @param int $id Member id
-     *
-     * @return bool
      */
-    public function removeCoords(int $id): bool
+    public function remove(int $id): void
     {
-        global $zdb;
-
-        try {
-            $delete = $zdb->delete($this->getTableName());
-            $delete->where([self::PK => $id]);
-            $del = $zdb->execute($delete);
-            return ($del->count() > 0);
-        } catch (\Exception $e) {
-            Analog::log(
-                'Unable to set coordinates for member '
-                . $id . ' | ' . $e->getMessage(),
-                Analog::ERROR
-            );
-            return false;
-        }
+        $delete = $this->zdb->delete($this->getTableName());
+        $delete->where([self::PK => $id]);
+        $this->zdb->execute($delete);
     }
 
     /**
      * Get table's name
-     *
-     * @return string
      */
     protected function getTableName(): string
     {
