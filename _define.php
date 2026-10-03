@@ -13,10 +13,10 @@ $this->register(
     name: 'Galette Maps',     //Name
     desc: 'Maps features',    //Short description
     author: 'Johan Cwiklinski', //Author
-    version: '2.2.1',            //Version
+    version: '2.3.0',            //Version
     compver:  '1.3.0',            //Galette compatible version
     route: 'maps',             //routing name and translation domain
-    date: '2025-12-08',       //Release date
+    date: '2026-10-03',       //Release date
     acls: [   //Permissions needed
         'maps_localize_member'   => 'member',
         'maps_mymap'             => 'member',
