@@ -1,26 +1,24 @@
 ---
-title: Documentation
-description: Member geolocation and public map
+title: Dokumentacija
+description: Geolokacija članova i javna karta
 ---
 
-This plugin provides:
+Dodatak omogućuje:
 
-* possibility to store geographical coordinates for members (latitude and
-  longitude),
-* a public map displaying up to date members that have chosen to be publicly
-  visible.
+* pohranu geografskih koordinata članova (zemljopisne širine i dužine),
+* javnu kartu članova s podmirenom članarinom koji su pristali na javni prikaz.
 
-## Installation
+## Instalacija
 
-First of all, download the plugin:
+Najprije preuzmite dodatak:
 
-* [Get latest Maps
-  plugin!](https://github.com/galette-plugins/plugin-maps/releases/latest)
-* [Get Maps plugin nightly
-  build!](https://github.com/galette-plugins/plugin-maps/releases/tag/nightly)
+* [Preuzmite najnoviji dodatak
+  Maps!](https://github.com/galette-plugins/plugin-maps/releases/latest)
+* [Preuzmite noćnu razvojnu verziju dodatka
+  Maps!](https://github.com/galette-plugins/plugin-maps/releases/tag/nightly)
 
-Extract the downloaded archive in Galette `plugins` directory. For example,
-under linux (replacing `{url}` and `{version}` with correct values):
+Raspakirajte preuzetu arhivu u Galetteovu mapu `plugins`. Primjerice, na Linuxu
+(zamijenite `{url}` i `{version}` odgovarajućim vrijednostima):
 
 ```bash
 $ cd /var/www/html/galette/plugins
@@ -28,120 +26,113 @@ $ wget {url}
 $ tar xjvf galette-plugin-maps-{version}.tar.bz2
 ```
 
-## Database initialisation
+## Inicijalizacija baze podataka
 
-In order to work, this plugin requires several tables in the database. See
-[Galette plugins management
-interface](https://doc.galette.eu/en/master/plugins/index.html#plugins-managment).
+Dodatak zahtijeva nekoliko tablica u bazi. Pogledajte [sučelje za upravljanje
+dodacima
+Galettea](https://doc.galette.eu/en/master/plugins/index.html#plugins-managment).
 
-And this is finished; Maps plugin is installed :)
+Gotovo; dodatak Maps je instaliran :)
 
-## Background map
+## Kartografska podloga
 
-> **Note** — The provider setting appeared in version 2.3.0.
+> **Napomena** — Odabir pružatelja dodan je u verziji 2.3.0.
 
-The provider is a setting from `Maps settings`, in the `Configuration` menu.
+Pružatelja odabirete u `Postavkama karte` u izborniku `Postavke`.
 
-![The provider setting, in Maps settings](images/tiles_settings.png)
+![Odabir pružatelja u postavkama karte](images/tiles_settings.png)
 
-Several providers are proposed:
+Ponuđeni su pružatelji:
 
-* **OpenFreeMap, light grey** — the default. Vector tiles, in a discreet grey
-  that lets member markers stand out. No account, no API key, and the service
-  can be [self-hosted](https://openfreemap.org).
-* **OpenFreeMap, colours** — the same service, rendered in full colour.
-* **OpenStreetMap** — the standard rendering, from the OpenStreetMap Foundation
-  servers.
-* **OpenStreetMap France** and **Humanitarian OSM Team** — hosted by the OSM-FR
-  association; the second one gives more weight to roads and facilities.
-* **OpenStreetMap Germany** — German rendering, favouring local names.
-* **Esri, light grey** — a very light grey rendering, close to what the plugin
-  displayed before.
+* **OpenFreeMap, svijetlosiva** — zadano. Vektorske pločice u nenametljivoj
+  sivoj boji ističu oznake članova. Nisu potrebni račun ni API ključ, a uslugu
+  možete [samostalno hostati](https://openfreemap.org).
+* **OpenFreeMap, u boji** — ista usluga s prikazom u punoj boji.
+* **OpenStreetMap** — standardni prikaz s poslužitelja zaklade OpenStreetMap.
+* **OpenStreetMap France** i **Humanitarian OSM Team** — hosta ih udruga OSM-FR;
+  drugi prikaz više ističe ceste i objekte.
+* **OpenStreetMap Germany** — njemački prikaz koji daje prednost lokalnim
+  nazivima.
+* **Esri, svijetlosiva** — vrlo svijetlosivi prikaz sličan ranijem prikazu
+  dodatka.
 
-### Your own values
+### Vlastite vrijednosti
 
-> **Warning** — Check the usage policy of the provider you choose. Most of them
-> are run by associations or by volunteers, and they set conditions on the
-> traffic they accept.
+> **Upozorenje** — Provjerite uvjete uporabe odabranog pružatelja. Većinu usluga
+> vode udruge ili volonteri koji određuju uvjete dopuštenog prometa.
 
-The last entry of the list, `Your own values`, replaces the proposed providers
-with an address of your own — a provider that is not listed, or your own tile
-server.
+Zadnja stavka popisa, `Vlastite vrijednosti`, zamjenjuje ponuđene pružatelje
+vašom adresom: nenavedenim pružateljem ili vlastitim poslužiteljem pločica.
 
-![The fields of the Your own values entry](images/tiles_custom.png)
+![Polja stavke Vlastite vrijednosti](images/tiles_custom.png)
 
-* **Vector tiles** tells the plugin what it is being given: a MapLibre style
-  when ticked, classic raster tiles when not.
-* **Address** is the style address for vector tiles, and the tiles address for
-  raster ones, such as `https://tile.openstreetmap.org/{z}/{x}/{y}.png`.
-* **Attribution** is the credit the provider requires. HTML is allowed. It is
-  not a formality: data licences make it mandatory.
-* **Maximum zoom** is the deepest zoom level the provider serves. Going past it
-  displays empty tiles.
-* **Subdomains** lists the letters the `{s}` token of the address is replaced
-  with, for instance `abc`. Raster tiles only.
+* **Vektorske pločice** određuje što dodatak prima: stil MapLibre ako je
+  označeno ili klasične rasterske pločice ako nije.
+* **Adresa** je adresa stila za vektorske pločice ili adresa rasterskih pločica,
+  primjerice `https://tile.openstreetmap.org/{z}/{x}/{y}.png`.
+* **Navođenje izvora** sadrži obvezno priznanje pružatelju. Dopušten je HTML. To
+  nije samo formalnost: licence podataka zahtijevaju navođenje izvora.
+* **Najveće povećanje** najviša je razina povećanja koju pružatelj podržava.
+  Veće razine prikazuju prazne pločice.
+* **Poddomene** navodi slova kojima se zamjenjuje oznaka `{s}` u adresi,
+  primjerice `abc`. Vrijedi samo za rasterske pločice.
 
-## Positions precision
+## Preciznost položaja
 
-A member's stored position is often their home address. The map does not show it
-as is: positions are snapped to a grid, so a marker lands near the member, not
-on their door.
+Pohranjeni položaj člana često je kućna adresa. Karta ga ne prikazuje izravno,
+nego položaje prilagođava mreži kako bi oznaka bila blizu člana, a ne na
+njegovim vratima.
 
-The precision is a setting from `Maps settings`, in the `Configuration` menu:
+Preciznost određujete u `Postavkama karte` u izborniku `Postavke`:
 
-* **About 100 km**, **About 50 km**, **About 5 km** — for a region, a
-  département or a town;
-* **About 500 m** — the default, a neighbourhood;
-* **About 50 m** — a street;
-* **Exact position** — no snapping, as the plugin behaved before.
+* **Oko 100 km**, **Oko 50 km**, **Oko 5 km** — za regiju, županiju ili mjesto;
+* **Oko 500 m** — zadano, za susjedstvo;
+* **Oko 50 m** — za ulicu;
+* **Točan položaj** — bez prilagodbe mreži, kao u ranijim verzijama.
 
-The value is how far, at most, a marker may be from the stored position.
+Vrijednost je najveća moguća udaljenost oznake od pohranjenog položaja.
 
-Snapping applies to visitors and to members, group managers included. Staff
-members and administrators see exact positions, and every member sees their own
-position as they stored it. The page used to set a member's position is not
-concerned: it shows the exact position to the people allowed to open it.
+Prilagodba položaja vrijedi za posjetitelje i članove, uključujući voditelje
+grupa. Uprava i administratori vide točne položaje, a svaki član vidi svoj
+položaj kako ga je pohranio. Stranica za postavljanje položaja nije obuhvaćena
+time: točan položaj prikazuje svima koji je smiju otvoriti.
 
-When the map shows snapped positions, zooming stops at a level matching the
-precision, so that a marker does not seem to point at a precise address.
+Ako karta prikazuje prilagođene položaje, povećanje je ograničeno prema
+preciznosti kako oznaka ne bi izgledala kao da pokazuje točnu adresu.
 
-## Plugin usage
+## Uporaba dodatka
 
-When the plugin is installed, a group `Maps` is added to Galette menu when a
-member is logged in, which contains `My location` entry. This page allow member
-to store its location.
+Nakon instalacije prijavljenom se članu u izborniku pojavljuje odjeljak `Karte`
+sa stavkom `Moja lokacija`. Na toj stranici član može pohraniti svoj položaj.
 
-A `Geolocalize` button is also added when displaying a member, that allows
-administrators to set member coordinates.
+Pri prikazu člana dodaje se i gumb `Odredi lokaciju`, kojim administratori mogu
+zadati koordinate člana.
 
-Also, a `Map` entry is added in public pages list, that displays geolocalized
-members that are up to date. Administrators and staff members will see all
-members, while simple members and visitors will only see up to date public ones.
+Na javne se stranice dodaje stavka `Karta`, koja prikazuje članove s lokacijom i
+podmirenom članarinom. Administratori i uprava vide sve članove, a obični
+članovi i posjetitelji samo javno vidljive članove s podmirenom članarinom.
 
-First of all, members will enter their location coordinates. Several options are
-provided:
+Član najprije unosi koordinate svojeg položaja. Dostupne su mogućnosti:
 
-* if town has been set in member information, a list of possible places will be
-  proposed (via [Nominatim online
-  service](https://nominatim.openstreetmap.org)),
-* additionally, a search zone (provided from
-  [OpenStreetMap](https://nominatim.openstreetmap.org/)),
-* and also a geolocalize button using browser capacities.
+* ako je u podacima člana navedeno mjesto, predlaže se popis mogućih lokacija
+  putem [mrežne usluge Nominatim](https://nominatim.openstreetmap.org),
+* dodatno polje pretraživanja koje pruža
+  [OpenStreetMap](https://nominatim.openstreetmap.org/),
+* gumb za određivanje lokacije pomoću preglednika.
 
-The search zone can be used when saving members location, and when displaying
-the maps.
+Polje pretraživanja dostupno je pri spremanju lokacije člana i prikazu karte.
 
-![The list of towns proposed for a member](images/towns_list.png)
+![Popis mjesta predloženih članu](images/towns_list.png)
 
-A member can define its location (with the precision he wants) on the map
-selecting one of the propositions:
+Član može odrediti lokaciju na karti uz željenu preciznost odabirom jedne od
+ponuđenih mogućnosti:
 
-![Selecting a location on the map](images/location_select.png)
+![Odabir lokacije na karti](images/location_select.png)
 
-Using the geolocalization button will define its position from the browser:
+Gumb za određivanje lokacije postavlja položaj koji utvrdi preglednik:
 
-![The geolocalize button](images/geoloc.png)
+![Gumb za određivanje lokacije](images/geoloc.png)
 
-Then, member location is displayed on map, and can be removed:
+Lokacija člana zatim se prikazuje na karti i može se ukloniti:
 
-![The selected location, displayed on the map](images/location_selected.png)
+![Odabrana lokacija prikazana na karti](images/location_selected.png)
