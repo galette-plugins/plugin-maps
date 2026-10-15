@@ -14,7 +14,7 @@
   "author": "Johan Cwiklinski <johan AT x-tnd DOT be>",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "del": "^6.1.1",
+    "del": "^9.0.1",
     "esbuild": "^0.28.2",
     "gulp": "^5.0.1",
     "gulp-clean-css": "^4.3.0",
