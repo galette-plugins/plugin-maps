@@ -9,7 +9,7 @@ A [Galette](https://galette.eu) plugin to geolocalize members: it stores geograp
 
 Map display uses [MapLibre GL](https://maplibre.org/) with [OpenFreeMap](https://openfreemap.org/) vector tiles by default — no API key, no registration, and the whole thing can be self-hosted. An administrator picks another provider, or enters their own address, from Configuration. Search is provided by the [Nominatim](https://nominatim.openstreetmap.org/) API.
 
-This plugin is developed and maintained by the **Galette core team**, along with Galette itself — unlike most of the plugins hosted in this organization, which are community-maintained.
+This plugin is developed and maintained by the **Galette core team**, along with Galette itself.
 
 * website: https://galette-plugins.github.io/plugin-maps/
 * bugs and features: https://bugs.galette.eu/projects/galette-plugin-maps
@@ -29,7 +29,7 @@ Un plugin [Galette](https://galette.eu) pour géolocaliser les adhérents : il e
 
 Les cartes sont rendues par [MapLibre GL](https://maplibre.org/) à partir des tuiles vectorielles [OpenFreeMap](https://openfreemap.org/) par défaut : sans clé d'API, sans inscription, et auto-hébergeable. Un administrateur peut choisir un autre fournisseur, ou saisir sa propre adresse, depuis la Configuration. La recherche est assurée par l'API [Nominatim](https://nominatim.openstreetmap.org/).
 
-Ce plugin est développé et maintenu par l'**équipe Galette**, comme Galette lui-même — contrairement à la plupart des plugins hébergés dans cette organisation, qui sont maintenus par la communauté.
+Ce plugin est développé et maintenu par l'**équipe Galette**, comme Galette lui-même.
 
 * site web : https://galette-plugins.github.io/plugin-maps/
 * bogues et fonctionnalités : https://bugs.galette.eu/projects/galette-plugin-maps
