@@ -7,7 +7,7 @@ Un plugin [Galette](https://galette.eu) pour géolocaliser les adhérents : il
 stocke les coordonnées géographiques de chaque adhérent, et affiche ceux qui ont
 accepté que leur profil soit publiquement visible sur une carte.
 
-Le rende des cartes es assuré par [MapLibre GL](https://maplibre.org/) de
+Le rendu des cartes est assuré par [MapLibre GL](https://maplibre.org/) de
 [OpenFreeMap](https://openfreemap.org/) tuiles vectorielles par défaut — pas de
 clé API, pas d'enregistrement, et l'ensemble peut-être auto-hébergé. Un
 administrateur peut sélectionner un autre fournisseur, ou entrer leur propre
